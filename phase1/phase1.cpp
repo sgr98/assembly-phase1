@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+
 #include "./Components/LexicalAnalyser/lexical_analyser.h"
+#include "./Components/Encoder/encoder.h"
 using namespace std;
 
 int main() {
@@ -18,6 +20,11 @@ int main() {
     // TURNING IT INTO LEXICAL UNITS
     LexicalAnalyser LexAnl(arr);
     LexAnl.printInstructions(LexAnl.instructions);
-    cout << LexAnl.instructions.size();
+    cout << LexAnl.instructions.size() << endl;
+
+    //TURNING LEXICAL UNITS INTO BIT INSTRUCTIONS
+    Encoder encoder(LexAnl.instructions);
+    encoder.printEncodeInstructions(encoder.encodedInstructions);
+    cout << encoder.encodedInstructions.size();
     return 0;
 }

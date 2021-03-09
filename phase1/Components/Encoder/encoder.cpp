@@ -1,79 +1,8 @@
-// Testing Grounds
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
 #include <bitset>
+#include "./encoder.h"
+#include "./../LexicalAnalyser/lexical_analyser.h"
 using namespace std;
-
-struct lex {
-    char lexes[10];
-};
-
-struct instruction {
-    struct lex lexeme[4];
-    char type;   // Currently R = R-TYPE and I = I-TYPE
-    int size = 0;
-};
-
-struct bitIns {
-    bitset<32> word; 
-};
-
-bool isVisibleCharacter(char c) {
-    if( c > (char) 32)
-        return true;
-    return false;
-}
-
-vector<struct instruction> getInstructions(char arr[1000]) {
-    vector<struct instruction> instructions;
-    char temp[10];
-    int i = 0;
-    
-    while(arr[i] != '\0') {
-        struct instruction instruction;
-        int j = 0;
-        int n = 0;
-        int k = 0;
-        while(arr[i] != '\n') {
-            if(isVisibleCharacter(arr[i]) && arr[i] != ',') {
-                instruction.lexeme[j].lexes[k] = arr[i];
-                k++;
-                n = j;
-            }
-            else {
-                if(k != 0) {
-                    instruction.lexeme[j].lexes[k] = '\0';
-                    j++;
-                }
-                k = 0;
-            }
-            i++;
-        }
-        instruction.lexeme[n].lexes[k] = '\0';
-        instruction.size = n + 1;
-        instructions.push_back(instruction);
-        i++;
-    }
-
-    return instructions;
-}
-
-void printInstructions(vector<struct instruction> instructions) {
-    int size = instructions.size();
-    for(int i = 0; i < size; i++) {
-        int n = instructions[i].size;
-        for(int j = 0; j < n; j++) {
-            cout << instructions[i].lexeme[j].lexes;
-            cout << "\t";
-        }
-        cout << endl;
-    }
-}
-
-
-
 
 int stringToInt(char a[10]) {
     int n = 0;
@@ -84,13 +13,6 @@ int stringToInt(char a[10]) {
             n += d;
         }
         n *= -1;
-    }
-    else if( !((a[0] >= (char) 48) && (a[0] <= (char) 57)) ) {
-        for(int i = 1; a[i] != '\0'; i++) {
-            n *= 10;
-            int d = ((int) a[i]) - 48;
-            n += d;
-        }
     }
     else {
         for(int i = 0; a[i] != '\0'; i++) {
@@ -103,7 +25,11 @@ int stringToInt(char a[10]) {
     return n;
 }
 
-struct bitIns encode(struct instruction ins) {
+Encoder::Encoder(vector<struct instruction> instructions) {
+    this->encodedInstructions = encodeAll(instructions);
+}
+
+struct bitIns Encoder::encode(struct instruction ins) {
     struct bitIns bin;
     
     int size = ins.size;
@@ -208,7 +134,7 @@ struct bitIns encode(struct instruction ins) {
     return bin;
 }
 
-vector<struct bitIns> encodeAll(vector<struct instruction> instructions) {
+vector<struct bitIns> Encoder::encodeAll(vector<struct instruction> instructions) {
     vector<struct bitIns> encodedInstructions;
     int size = instructions.size();
 
@@ -220,7 +146,7 @@ vector<struct bitIns> encodeAll(vector<struct instruction> instructions) {
     return encodedInstructions;
 }
 
-void printEncodeInstructions(vector<struct bitIns> bins) {
+void Encoder::printEncodeInstructions(vector<struct bitIns> bins) {
     int size = bins.size();
     for(int i = 0; i < size; i++) {
         // cout << bins[i].word << endl;
@@ -231,18 +157,4 @@ void printEncodeInstructions(vector<struct bitIns> bins) {
         }
         cout << endl;
     }
-}
-
-int main() {
-    char arr[1000] = "ADDI R1, R2, 2\nADD R4, R5, R6\nSUB R7, R8, R9\nBNE R10, R11, 4\nJUMP 6\nLD R12, A1\nST R13, A2\n";
-    // cout << arr;
-
-    vector<struct instruction> instructions;
-    instructions = getInstructions(arr);
-    printInstructions(instructions);
-
-    vector<struct bitIns> encodedInstructions = encodeAll(instructions);
-    printEncodeInstructions(encodedInstructions);
-
-    return 0;
 }
