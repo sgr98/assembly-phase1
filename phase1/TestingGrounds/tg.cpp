@@ -233,8 +233,152 @@ void printEncodeInstructions(vector<struct bitIns> bins) {
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+int bitToInt(struct bitIns in, int i, int j) {
+    int n = 0;
+    int m = 1;
+    int k = j;
+    while(k >= i) {
+        m *= 2;
+        n *= 2;
+        n += in.word[k];
+        k--;
+    }
+    if(!(j == 31 && i == 26) && in.word[j] == 1) {
+        n = n - m;
+    }
+    return n;
+}
+
+void add(int registers[32], int dr, int sr1, int sr2) {
+    registers[dr] =  registers[sr1] + registers[sr2];
+}
+
+void sub(int registers[32], int dr, int sr1, int sr2) {
+    registers[dr] =  registers[sr1] - registers[sr2];
+}
+
+void addi(int registers[32], int aa, int bb, int immediate) {
+    registers[aa] =  registers[bb] + immediate;
+}
+
+void bne(int registers[32], int aa, int bb, int immediate) {
+    if(registers[aa] != registers[bb]) {
+        registers[0] += immediate;
+    }
+    else {
+        registers[0]++;
+    }
+}
+
+void beq(int registers[32], int aa, int bb, int immediate) {
+    if(registers[aa] == registers[bb]) {
+        registers[0] += immediate;
+    }
+    else {
+        registers[0]++;
+    }
+}
+
+void jump(int registers[32], int immediate) {
+    registers[0] += immediate;
+}
+
+void ld(int dr, int Ain, int inc) {
+    int index = Ain + inc;
+    // registers[dr] = memory[index];
+}
+
+void st(int dr, int Ain, int inc) {
+    int index = Ain + inc;
+    // memory[index] = registers[dr];
+}
+
+void execute(struct bitIns inst, int registers[32]) {
+    int op = bitToInt(inst, 26, 31);
+    //  R-TYPE
+    if(inst.word[31] == 0 && inst.word[30] == 0) {
+        int dr = bitToInt(inst, 21, 25);
+        int sr1 = bitToInt(inst, 16, 20);
+        int sr2 = bitToInt(inst, 11, 15);
+
+        if(op == 1) {
+            add(registers, dr, sr1, sr2);
+            registers[0]++;
+        }
+        else if(op == 2) {
+            sub(registers, dr, sr1, sr2);
+            registers[0]++;
+        }
+    }
+    //  I-TYPE
+    else if(inst.word[31] == 0 && inst.word[30] == 1) {
+        int aa = bitToInt(inst, 21, 25);
+        int bb = bitToInt(inst, 16, 20);
+        int immediate = bitToInt(inst, 0, 15);
+
+        if(op == 17) {
+            addi(registers, aa, bb, immediate);
+            registers[0]++;
+        }
+        else if(op == 18) {
+            bne(registers, aa, bb, immediate);
+        }
+        else if(op == 19) {
+            beq(registers, aa, bb, immediate);
+        }
+    }
+    //  J-TYPE
+    else if(inst.word[31] == 1 && inst.word[30] == 0) {
+        int immediate = bitToInt(inst, 0, 15);
+        if(op == 33) {
+            jump(registers, immediate);
+        }
+    }
+    //  L-TYPE
+    else if(inst.word[31] == 1 && inst.word[30] == 1) {
+        int dr = bitToInt(inst, 21, 25);
+        int Ain = bitToInt(inst, 16, 20);
+        int inc = bitToInt(inst, 11, 15);
+
+        if(op == 48) {
+            ld(dr, Ain, inc);
+            registers[0]++;
+        }
+        else if(op == 49) {
+            st(dr, Ain, inc);
+            registers[0]++;
+        }
+    }
+}
+
+void executeAll(vector<struct bitIns> encodedIns, int registers[32]) {
+    int size = encodedIns.size();
+    while(registers[0] < size) {
+        // cout << "EXECUTE => " << registers[0] << endl;
+        execute(encodedIns[registers[0]], registers);
+    }
+}
+
+void printRegisters(int registers[32]) {
+    for(int i = 0; i < 32; i++) {
+        cout << "R" << i << " = " << registers[i] << endl;
+    }
+}
+
+
 int main() {
-    char arr[1000] = "ADDI R1, R2, 2\nADD R4, R5, R6\nSUB R7, R8, R9\nBNE R10, R11, 4\nJUMP 6\nLD R12, A1\nST R13, A2\n";
+    // char arr[1000] = "ADDI R1, R2, 2\nADD R4, R5, R6\nSUB R7, R8, R9\nBNE R10, R11, 4\nJUMP 6\nLD R12, A1, R13\nST R14, A2, R15\n";
+    char arr[1000] = "ADDI R1, R2, 2\nADD R4, R5, R6\nSUB R7, R8, R9\nBNE R10, R11, -1\nJUMP 1\n";
     // cout << arr;
 
     vector<struct instruction> instructions;
@@ -243,6 +387,25 @@ int main() {
 
     vector<struct bitIns> encodedInstructions = encodeAll(instructions);
     printEncodeInstructions(encodedInstructions);
+
+    int registers[32] = {0};
+    int memory[100] = {0};
+    // int memory[100];
+
+    registers[0] = 0;
+    registers[1] = 5;
+    registers[2] = 6;
+    registers[4] = 7;
+    registers[5] = 8;
+    registers[6] = 9;
+    registers[7] = 10;
+    registers[8] = 11;
+    registers[9] = 12;
+    registers[10] = 13;
+    registers[11] = 13;
+    cout << encodedInstructions.size() << endl;
+    executeAll(encodedInstructions, registers);
+    printRegisters(registers);
 
     return 0;
 }

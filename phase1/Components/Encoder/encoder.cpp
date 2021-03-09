@@ -14,6 +14,13 @@ int stringToInt(char a[10]) {
         }
         n *= -1;
     }
+    else if( !((a[0] >= (char) 48) && (a[0] <= (char) 57)) ) {
+        for(int i = 1; a[i] != '\0'; i++) {
+            n *= 10;
+            int d = ((int) a[i]) - 48;
+            n += d;
+        }
+    }
     else {
         for(int i = 0; a[i] != '\0'; i++) {
             n *= 10;
@@ -47,34 +54,34 @@ struct bitIns Encoder::encode(struct instruction ins) {
         bin.word[26] = 1;
         bin.word[31] = 1;
     }
-    //  SIZE = 3 (2 ARGS)
-    else if(size == 3) {
-        int i = 0;
-        int d = 1;
-        int n = stringToInt(ins.lexeme[1].lexes);
-        while(i < 5) {
-            bin.word[21 + i] = n & d;
-            d = d << 1;
-            i++;
-        }
-        i = 0;
-        d = 1;
-        n = stringToInt(ins.lexeme[2].lexes);
-        while(i < 5) {
-            bin.word[16 + i] = n & d;
-            d = d << 1;
-            i++;
-        }
+    // //  SIZE = 3 (2 ARGS)
+    // else if(size == 3) {
+    //     int i = 0;
+    //     int d = 1;
+    //     int n = stringToInt(ins.lexeme[1].lexes);
+    //     while(i < 5) {
+    //         bin.word[21 + i] = n & d;
+    //         d = d << 1;
+    //         i++;
+    //     }
+    //     i = 0;
+    //     d = 1;
+    //     n = stringToInt(ins.lexeme[2].lexes);
+    //     while(i < 5) {
+    //         bin.word[16 + i] = n & d;
+    //         d = d << 1;
+    //         i++;
+    //     }
 
-        bin.word[30] = 1;
-        bin.word[31] = 1;
-        if(ins.lexeme[0].lexes[0] == 'L' && ins.lexeme[0].lexes[1] == 'D') {
-            bin.word[26] = 1;
-        }
-        else if(ins.lexeme[0].lexes[0] == 'S' && ins.lexeme[0].lexes[1] == 'T') {
-            bin.word[27] = 1;
-        }
-    }
+    //     bin.word[30] = 1;
+    //     bin.word[31] = 1;
+    //     if(ins.lexeme[0].lexes[0] == 'L' && ins.lexeme[0].lexes[1] == 'D') {
+    //         bin.word[26] = 1;
+    //     }
+    //     else if(ins.lexeme[0].lexes[0] == 'S' && ins.lexeme[0].lexes[1] == 'T') {
+    //         bin.word[27] = 1;
+    //     }
+    // }
     //  SIZE = 4 (3 ARGS)
     else if(size == 4) {
         int i = 0;
@@ -95,7 +102,8 @@ struct bitIns Encoder::encode(struct instruction ins) {
         }
 
         if(ins.lexeme[0].lexes[0] == 'A' && ins.lexeme[0].lexes[1] == 'D' && ins.lexeme[0].lexes[2] == 'D' && ins.lexeme[0].lexes[3] == 'I'
-        || ins.lexeme[0].lexes[0] == 'B' && ins.lexeme[0].lexes[1] == 'N' && ins.lexeme[0].lexes[2] == 'E') {
+        || ins.lexeme[0].lexes[0] == 'B' && ins.lexeme[0].lexes[1] == 'N' && ins.lexeme[0].lexes[2] == 'E'
+        || ins.lexeme[0].lexes[0] == 'B' && ins.lexeme[0].lexes[1] == 'E' && ins.lexeme[0].lexes[2] == 'Q') {
             i = 0;
             d = 1;
             n = stringToInt(ins.lexeme[3].lexes);
@@ -110,6 +118,10 @@ struct bitIns Encoder::encode(struct instruction ins) {
             }
             else if(ins.lexeme[0].lexes[0] == 'B' && ins.lexeme[0].lexes[1] == 'N' && ins.lexeme[0].lexes[2] == 'E') {
                 bin.word[27] = 1;
+            }
+            else if(ins.lexeme[0].lexes[0] == 'B' && ins.lexeme[0].lexes[1] == 'E' && ins.lexeme[0].lexes[2] == 'Q') {
+                bin.word[27] = 1;
+                bin.word[26] = 1;
             }
 
         }
@@ -126,6 +138,17 @@ struct bitIns Encoder::encode(struct instruction ins) {
                 bin.word[26] = 1;
             }
             else if(ins.lexeme[0].lexes[0] == 'S' && ins.lexeme[0].lexes[1] == 'U' && ins.lexeme[0].lexes[2] == 'B') {
+                bin.word[27] = 1;
+            }
+
+            else if(ins.lexeme[0].lexes[0] == 'L' && ins.lexeme[0].lexes[1] == 'D') {
+                bin.word[31] = 1;
+                bin.word[30] = 1;
+                bin.word[26] = 1;
+            }
+            else if(ins.lexeme[0].lexes[0] == 'S' && ins.lexeme[0].lexes[1] == 'T') {
+                bin.word[31] = 1;
+                bin.word[30] = 1;
                 bin.word[27] = 1;
             }
         }

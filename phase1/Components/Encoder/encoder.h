@@ -7,28 +7,19 @@ struct bitIns {
     bitset<32> word; 
 };
 
-// struct lex {
-//     char lexes[10];
-// };
-
-// struct instruction {
-//     struct lex lexeme[4];
-//     char type;   // Currently R = R-TYPE and I = I-TYPE
-//     int size = 0;
-// };
-
 class Encoder {
-    // R-TYPES (3 args)
-    // ADD   :   00 0001
-    // SUB   :   00 0010
-    // I-TYPES (3 args)
-    // ADDI  :   01 0001
-    // BNE   :   01 0010
-    // J-TYPES (1 args)
-    // JUMP  :   10 0001
-    // L-TYPES (2 args)
-    // LD    :   11 0001
-    // ST    :   11 0010
+    // R-TYPES (3 args)     ////(0 - 15)
+    // ADD   :   00 0001    (1)
+    // SUB   :   00 0010    (2)
+    // I-TYPES (3 args)     ////(16 - 31)
+    // ADDI  :   01 0001    (17)
+    // BNE   :   01 0010    (18)
+    // BEQ   :   01 0011    (19)
+    // J-TYPES (1 args)     ////(32 - 47)
+    // JUMP  :   10 0001    (33)
+    // L-TYPES (3 args)     ////(48 - 63)
+    // LD    :   11 0001    (49)
+    // ST    :   11 0010    (50)
     
     public:
         vector<struct bitIns> encodedInstructions;
