@@ -8,8 +8,54 @@ bool isVisibleCharacter(char c) {
     return false;
 }
 
-LexicalAnalyser::LexicalAnalyser(char a[1000]) {
-    this->instructions = getInstructions(a);
+bool compare(char *arr, char *brr) {
+    int i = 0;
+    while(brr[i] != '\0' && brr[i] == *(arr + i)) {
+        i++;
+    }
+    if(brr[i] == '\0')
+        return true;
+    return false;
+}
+
+LexicalAnalyser::LexicalAnalyser(char a[1500]) {
+    extract(a);
+    this->memSetups = getInstructions(this->Initialise);
+    this->instructions = getInstructions(this->Program);
+}
+
+void LexicalAnalyser::extract(char arr[1500]) {
+    char pmain[] = "&$MAIN:";
+    char pend[] = "&$END:";
+    int i = 0;
+    int j = 0;
+    bool NOTencMain = true;
+    while(NOTencMain && arr[i] != '\0') {
+        NOTencMain = !compare(&arr[i], pmain);
+        if(!NOTencMain) {
+            break;
+        }
+        else {
+            this->Initialise[j] = arr[i];
+            j++;
+        }
+        i++;
+    }
+    this->Initialise[j] = '\0';
+
+    i += 8;     // For the length of &$MAIN:\n
+    j = 0;
+    while(!NOTencMain && arr[i] != '\0') {
+        if(compare(&arr[i], pend)) {
+            break;
+        }
+        else {
+            this->Program[j] = arr[i];
+            j++;
+        }
+        i++;
+    }
+    this->Program[j] = '\0';  
 }
 
 vector<struct instruction> LexicalAnalyser::getInstructions(char arr[1000]) {
@@ -46,12 +92,12 @@ vector<struct instruction> LexicalAnalyser::getInstructions(char arr[1000]) {
     return instructions;
 }
 
-void LexicalAnalyser::printInstructions(vector<struct instruction>) {
-    int size = instructions.size();
+void LexicalAnalyser::printInstructions(vector<struct instruction> ins) {
+    int size = ins.size();
     for(int i = 0; i < size; i++) {
-        int n = instructions[i].size;
+        int n = ins[i].size;
         for(int j = 0; j < n; j++) {
-            cout << instructions[i].lexeme[j].lexes;
+            cout << ins[i].lexeme[j].lexes;
             cout << "\t";
         }
         cout << endl;

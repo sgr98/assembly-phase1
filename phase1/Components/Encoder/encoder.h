@@ -25,6 +25,7 @@ class Encoder {
         vector<struct bitIns> encodedInstructions;
 
         Encoder(vector<struct instruction> instructions);
+        int stringToInt(char a[10]);
         vector<struct bitIns> encodeAll(vector<struct instruction> instructions);
         struct bitIns encode(struct instruction ins);
         void printEncodeInstructions(vector<struct bitIns> bins);

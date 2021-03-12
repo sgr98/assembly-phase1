@@ -13,11 +13,11 @@ using namespace std;
 int main() {
     Processor processor;
     processor.initialiseRegisters();
-    processor.initialiseMemory();
 
-    char arr[1000];
+
+    char arr[1500];
     ifstream obj;
-    obj.open("./sample1.asm", ios::in);
+    obj.open("./t.asm", ios::in);
     obj.getline(arr, 100);
     int i = 0;
     for(i = 0; arr[i] != '\0'; i++);
@@ -32,6 +32,13 @@ int main() {
     cout << "INSTRUCTIONS:" << endl;
     LexAnl.printInstructions(LexAnl.instructions);
     cout << "The number of instructions: " << LexAnl.instructions.size() << endl << endl;
+
+    //  Initialising memory according to the file
+    processor.initialiseMemory(LexAnl.memSetups);
+
+    // cout << "xxxxxxxxxxxxxxxxx" << endl;
+    // LexAnl.printInstructions(LexAnl.memSetups);
+    // cout << "xxxxxxxxxxxxxxxxx" << endl;
 
     ////////////////////////////////////////////////////////////////////////////
     //TURNING LEXICAL UNITS INTO BIT INSTRUCTIONS
@@ -49,7 +56,7 @@ int main() {
     cout << "------------------------------------------------------" << endl;
     processor.printMemory();
 
-    cout << "Program is executed" << endl;
+    cout << "PROGRAM IS EXECUTED-" << endl;
     processor.executeAll(encoder.encodedInstructions);
 
     cout << "------------------------------------------------------" << endl;

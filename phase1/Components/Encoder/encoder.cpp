@@ -4,7 +4,11 @@
 #include "./../LexicalAnalyser/lexical_analyser.h"
 using namespace std;
 
-int stringToInt(char a[10]) {
+Encoder::Encoder(vector<struct instruction> instructions) {
+    this->encodedInstructions = encodeAll(instructions);
+}
+
+int Encoder::stringToInt(char a[10]) {
     int n = 0;
     if(a[0] == '-') {
         for(int i = 1; a[i] != '\0'; i++) {
@@ -30,10 +34,6 @@ int stringToInt(char a[10]) {
         }
     }
     return n;
-}
-
-Encoder::Encoder(vector<struct instruction> instructions) {
-    this->encodedInstructions = encodeAll(instructions);
 }
 
 struct bitIns Encoder::encode(struct instruction ins) {

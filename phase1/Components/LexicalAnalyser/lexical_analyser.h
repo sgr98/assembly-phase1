@@ -16,9 +16,13 @@ bool isVisibleCharacter(char c);
 
 class LexicalAnalyser {
     public:
+        char Initialise[500];
+        char Program[1000];
+        vector<struct instruction> memSetups;
         vector<struct instruction> instructions;
 
         LexicalAnalyser(char a[1000]);
+        void extract(char arr[1500]);
         vector<struct instruction> getInstructions(char arr[1000]);
-        void printInstructions(vector<struct instruction>);        
+        void printInstructions(vector<struct instruction> ins);        
 };

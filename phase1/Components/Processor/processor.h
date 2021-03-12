@@ -12,7 +12,7 @@ class Processor {
 
         // INITIALIZE
         void initialiseRegisters();
-        void initialiseMemory();
+        void initialiseMemory(vector<struct instruction> memSetups);
 
         // SET
         void setRegister(int index, int value);
