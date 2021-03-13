@@ -143,6 +143,7 @@ void LexicalAnalyser::printInstructions(vector<struct instruction> ins) {
     int size = ins.size();
     for(int i = 0; i < size; i++) {
         int n = ins[i].size;
+        cout << i << ")\t";
         for(int j = 0; j < n; j++) {
             cout << ins[i].lexeme[j].lexes;
             cout << "\t";

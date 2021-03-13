@@ -15,9 +15,9 @@ int main() {
     processor.initialiseRegisters();
 
 
-    char arr[1500];
+    char *arr = new char[1500];
     ifstream obj;
-    obj.open("./t.asm", ios::in);
+    obj.open("./bubble_sort.asm", ios::in);         // Enter filename
     obj.getline(arr, 100);
     int i = 0;
     for(i = 0; arr[i] != '\0'; i++);
@@ -32,6 +32,7 @@ int main() {
     cout << "INSTRUCTIONS:" << endl;
     LexAnl.printInstructions(LexAnl.instructions);
     cout << "The number of instructions: " << LexAnl.instructions.size() << endl << endl;
+    delete[] arr;
 
     //  Initialising memory according to the file
     processor.initialiseMemory(LexAnl.memSetups);

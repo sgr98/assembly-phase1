@@ -219,6 +219,7 @@ void Processor::execute(struct bitIns inst) {
         if(op == 49) {
             ld(dr, Ain, inc);
             this->registers[0]++;
+            // printRegisters();
         }
         else if(op == 50) {
             st(dr, Ain, inc);
