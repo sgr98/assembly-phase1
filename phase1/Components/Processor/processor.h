@@ -3,12 +3,12 @@
 #include <bitset>
 using namespace std;
 
-#define max_memory_size 100
+#define max_memory_size 1000
 
 class Processor {
     public:
         int registers[32];
-        int memory[max_memory_size];
+        int *memory = new int[max_memory_size];
 
         // INITIALIZE
         void initialiseRegisters();
