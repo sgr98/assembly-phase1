@@ -119,6 +119,24 @@ void Processor::beq(int aa, int bb, int immediate) {
     }
 }
 
+void Processor::bgt(int aa, int bb, int immediate) {
+    if(this->registers[aa] > this->registers[bb]) {
+        this->registers[0] += immediate;
+    }
+    else {
+        this->registers[0]++;
+    }
+}
+
+void Processor::bge(int aa, int bb, int immediate) {
+    if(this->registers[aa] >= this->registers[bb]) {
+        this->registers[0] += immediate;
+    }
+    else {
+        this->registers[0]++;
+    }
+}
+
 void Processor::jump(int immediate) {
     this->registers[0] += immediate;
 }
@@ -177,6 +195,12 @@ void Processor::execute(struct bitIns inst) {
         }
         else if(op == 19) {
             beq(aa, bb, immediate);
+        }
+        else if(op == 20) {
+            bgt(aa, bb, immediate);
+        }
+        else if(op == 21) {
+            bge(aa, bb, immediate);
         }
     }
     //  J-TYPE

@@ -24,5 +24,6 @@ class LexicalAnalyser {
         LexicalAnalyser(char a[1000]);
         void extract(char arr[1500]);
         vector<struct instruction> getInstructions(char arr[1000]);
+        void assignTypes();
         void printInstructions(vector<struct instruction> ins);        
 };

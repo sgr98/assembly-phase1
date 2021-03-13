@@ -22,6 +22,7 @@ LexicalAnalyser::LexicalAnalyser(char a[1500]) {
     extract(a);
     this->memSetups = getInstructions(this->Initialise);
     this->instructions = getInstructions(this->Program);
+    assignTypes();
 }
 
 void LexicalAnalyser::extract(char arr[1500]) {
@@ -90,6 +91,52 @@ vector<struct instruction> LexicalAnalyser::getInstructions(char arr[1000]) {
     }
 
     return instructions;
+}
+
+void LexicalAnalyser::assignTypes() {
+    // R-TYPES (3 args)     ////(0 - 15)
+    // ADD   :   00 0001    (1)
+    // SUB   :   00 0010    (2)
+
+    // I-TYPES (3 args)     ////(16 - 31)
+    // ADDI  :   01 0001    (17)
+    // BNE   :   01 0010    (18)
+    // BEQ   :   01 0011    (19)
+    // BGT   :   01 0100    (20)
+    // BGE   :   01 0101    (21)
+
+    // J-TYPES (1 args)     ////(32 - 47)
+    // JUMP  :   10 0001    (33)
+
+    // L-TYPES (3 args)     ////(48 - 63)
+    // LD    :   11 0001    (49)
+    // ST    :   11 0010    (50)
+
+    // cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
+    int size = this->instructions.size();
+    for(int i = 0; i < size; i++) {
+        if(this->instructions[i].lexeme[0].lexes[0] == 'A' && this->instructions[i].lexeme[0].lexes[1] == 'D' && this->instructions[i].lexeme[0].lexes[2] == 'D' && this->instructions[i].lexeme[0].lexes[3] == 'I'
+        || this->instructions[i].lexeme[0].lexes[0] == 'B' && this->instructions[i].lexeme[0].lexes[1] == 'N' && this->instructions[i].lexeme[0].lexes[2] == 'E'
+        || this->instructions[i].lexeme[0].lexes[0] == 'B' && this->instructions[i].lexeme[0].lexes[1] == 'E' && this->instructions[i].lexeme[0].lexes[2] == 'Q'
+        || this->instructions[i].lexeme[0].lexes[0] == 'B' && this->instructions[i].lexeme[0].lexes[1] == 'G' && this->instructions[i].lexeme[0].lexes[2] == 'T'
+        || this->instructions[i].lexeme[0].lexes[0] == 'B' && this->instructions[i].lexeme[0].lexes[1] == 'G' && this->instructions[i].lexeme[0].lexes[2] == 'E') {
+            this->instructions[i].type = 'I';
+        }
+        else if(this->instructions[i].lexeme[0].lexes[0] == 'A' && this->instructions[i].lexeme[0].lexes[1] == 'D' && this->instructions[i].lexeme[0].lexes[2] == 'D'
+        || this->instructions[i].lexeme[0].lexes[0] == 'S' && this->instructions[i].lexeme[0].lexes[1] == 'U' && this->instructions[i].lexeme[0].lexes[2] == 'B') {
+            this->instructions[i].type = 'R';
+        }
+        else if(this->instructions[i].lexeme[0].lexes[0] == 'J' && this->instructions[i].lexeme[0].lexes[1] == 'U' && this->instructions[i].lexeme[0].lexes[2] == 'M' && this->instructions[i].lexeme[0].lexes[3] == 'P') {
+            this->instructions[i].type = 'J';
+        }
+        else if(this->instructions[i].lexeme[0].lexes[0] == 'L' && this->instructions[i].lexeme[0].lexes[1] == 'D'
+        || this->instructions[i].lexeme[0].lexes[0] == 'S' && this->instructions[i].lexeme[0].lexes[1] == 'T') {
+            this->instructions[i].type = 'L';
+        }
+        // cout << this->instructions[i].type << endl;
+    }
+    // cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
+
 }
 
 void LexicalAnalyser::printInstructions(vector<struct instruction> ins) {

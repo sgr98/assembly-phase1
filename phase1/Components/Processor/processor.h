@@ -3,7 +3,7 @@
 #include <bitset>
 using namespace std;
 
-#define max_memory_size 1000
+#define max_memory_size 50
 
 class Processor {
     public:
@@ -25,6 +25,8 @@ class Processor {
         void addi(int aa, int bb, int immediate);
         void bne(int aa, int bb, int immediate);
         void beq(int aa, int bb, int immediate);
+        void bgt(int aa, int bb, int immediate);
+        void bge(int aa, int bb, int immediate);
         // J-TYPE
         void jump(int immediate);
         // L-TYPE
