@@ -18,11 +18,50 @@ bool compare(char *arr, char *brr) {
     return false;
 }
 
+void intToString(char s[10], int val) {
+    int j = 0;
+    if(val == 0) {
+        s[0] = '0';
+        s[1] = '\0';
+        j++;
+    }
+    else if(val > 0) {
+        while(val > 0) {
+            int dig = val % 10;
+            char c = (char) (dig + 48);
+            s[j] = c;
+            j++;
+            val /= 10;
+        }
+        s[j] = '\0';
+    }
+    else {
+        val *= -1;
+        while(val > 0) {
+            int dig = val % 10;
+            char c = (char) (dig + 48);
+            s[j] = c;
+            j++;
+            val /= 10;
+        }
+        s[j] = '-';
+        j++;
+        s[j] = '\0';
+    }
+
+    for(int i = 0; i < j / 2; i++) {
+        char temp = s[i];
+        s[i] = s[j - i - 1];
+        s[j - i - 1] = temp;
+    }
+}
+
 LexicalAnalyser::LexicalAnalyser(char a[1500]) {
     extract(a);
     this->memSetups = getInstructions(this->Initialise);
     this->instructions = getInstructions(this->Program);
     assignTypes();
+    modifyInstructions();
 }
 
 void LexicalAnalyser::extract(char arr[1500]) {
@@ -149,5 +188,89 @@ void LexicalAnalyser::printInstructions(vector<struct instruction> ins) {
             cout << "\t";
         }
         cout << endl;
+    }
+}
+
+//  PHASE 2
+void LexicalAnalyser::modifyInstructions() {
+    vector<int> labelIndex;
+    vector<int> ijIndex;
+    int size = this->instructions.size();
+    for(int i = 0; i < size; i++) {
+        if(this->instructions[i].size == 1) {
+            labelIndex.push_back(i);
+        }
+        else if(this->instructions[i].type == 'J'
+        || (this->instructions[i].type == 'I' 
+        && !(this->instructions[i].lexeme[0].lexes[0] == 'A' && this->instructions[i].lexeme[0].lexes[1] == 'D' && this->instructions[i].lexeme[0].lexes[2] == 'D' && this->instructions[i].lexeme[0].lexes[3] == 'I')) ) {
+            ijIndex.push_back(i);
+        }
+    }
+
+    size = labelIndex.size();
+
+    for(int i = 0; i < size; i++) {
+        char label[10];
+        int j = 0;
+        for(j = 0; this->instructions[labelIndex[i]].lexeme[0].lexes[j] != '\0'; j++) {
+            label[j] = this->instructions[labelIndex[i]].lexeme[0].lexes[j];
+        }
+        label[j - 1] = '\0';
+
+        int loc = 0;
+        for(j = 0; j < size; j++) {
+            if(this->instructions[ijIndex[j]].size == 2) {
+                if(compare(label, this->instructions[ijIndex[j]].lexeme[1].lexes)) {
+                    loc = j;
+                    break;
+                }
+            }
+            else if(this->instructions[ijIndex[j]].size == 4) {
+                if(compare(label, this->instructions[ijIndex[j]].lexeme[3].lexes)) {
+                    loc = j;
+                    break;
+                }
+            }
+        }
+
+        j = 0;
+        while(j < size && labelIndex[j] < ijIndex[loc]) {
+            j++;
+        }
+
+        int value = labelIndex[i] - ijIndex[loc] + (j - i);
+        replaceLabel(ijIndex[loc], value);
+    }
+
+    // for(int i = 0; i < size; i++) {
+    //     cout << labelIndex[i] << " ";
+    // }
+    // cout << endl;
+    // for(int i = 0; i < size; i++) {
+    //     cout << ijIndex[i] << " ";
+    // }
+    // cout << endl;
+
+    for(int i = size - 1; i >= 0; i--) {
+        eraseInstruction(labelIndex[i]);
+    }
+}
+
+void LexicalAnalyser::eraseInstruction(int index) {
+    vector<struct instruction>::iterator it;
+    it = this->instructions.begin() + index;
+    this->instructions.erase(it);
+}
+
+void LexicalAnalyser::replaceLabel(int insIndex, int value) {
+    if(this->instructions[insIndex].lexeme[0].lexes[0] == 'A' && this->instructions[insIndex].lexeme[0].lexes[1] == 'D' && this->instructions[insIndex].lexeme[0].lexes[2] == 'D' && this->instructions[insIndex].lexeme[0].lexes[3] == 'I'
+    || this->instructions[insIndex].lexeme[0].lexes[0] == 'B' && this->instructions[insIndex].lexeme[0].lexes[1] == 'N' && this->instructions[insIndex].lexeme[0].lexes[2] == 'E'
+    || this->instructions[insIndex].lexeme[0].lexes[0] == 'B' && this->instructions[insIndex].lexeme[0].lexes[1] == 'E' && this->instructions[insIndex].lexeme[0].lexes[2] == 'Q'
+    || this->instructions[insIndex].lexeme[0].lexes[0] == 'B' && this->instructions[insIndex].lexeme[0].lexes[1] == 'G' && this->instructions[insIndex].lexeme[0].lexes[2] == 'T'
+    || this->instructions[insIndex].lexeme[0].lexes[0] == 'B' && this->instructions[insIndex].lexeme[0].lexes[1] == 'G' && this->instructions[insIndex].lexeme[0].lexes[2] == 'E') {
+        intToString(this->instructions[insIndex].lexeme[3].lexes, value);
+    }
+    else if(this->instructions[insIndex].lexeme[0].lexes[0] == 'J' && this->instructions[insIndex].lexeme[0].lexes[1] == 'U' && this->instructions[insIndex].lexeme[0].lexes[2] == 'M' && this->instructions[insIndex].lexeme[0].lexes[3] == 'P') {
+        intToString(this->instructions[insIndex].lexeme[1].lexes, value);
     }
 }

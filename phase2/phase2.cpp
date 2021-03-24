@@ -8,7 +8,7 @@
 using namespace std;
 
 //  COMPILE THIS:
-//  g++ .\phase1.cpp .\Components\Processor\processor.cpp .\Components\LexicalAnalyser\lexical_analyser.cpp .\Components\Encoder\encoder.cpp -o phase1
+//  g++ .\phase2.cpp .\Components\Processor\processor.cpp .\Components\LexicalAnalyser\lexical_analyser.cpp .\Components\Encoder\encoder.cpp -o phase2
 
 int main() {
     Processor processor;

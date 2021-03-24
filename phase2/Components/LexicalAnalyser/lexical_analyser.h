@@ -13,6 +13,7 @@ struct instruction {
 };
 
 bool isVisibleCharacter(char c);
+void intToString(char *s, int val);
 
 class LexicalAnalyser {
     public:
@@ -25,5 +26,9 @@ class LexicalAnalyser {
         void extract(char arr[1500]);
         vector<struct instruction> getInstructions(char arr[1000]);
         void assignTypes();
-        void printInstructions(vector<struct instruction> ins);        
+        void printInstructions(vector<struct instruction> ins);
+
+        void modifyInstructions();
+        void eraseInstruction(int index);
+        void replaceLabel(int insIndex, int value);    
 };
