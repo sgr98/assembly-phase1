@@ -192,19 +192,13 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
 
     int destinationRegisterWB = initialValue;
 
-    int runOnlyUpp = 1;
     int stallType = 0;
     bool branchDec= false;
 
     bool uniqueCase1 = false;
 
     while(IFoper || IRoper || EXoper || MEMoper || WBoper) {
-        cout << "\n|||||||||||||||||||||||||||||||||||||||||||||||\n" << endl;
-        printStalledInstructions();
-        cout << "Current Instruction Index: " << this->registers[0] << endl;
-        cout << "StallType: " << stallType << endl;
-        cout << "CLK: " << my_clock << endl;
-
+        my_clock++;
 
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
@@ -213,8 +207,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
-        if(WBoper && !(runOnlyUpp > 5)) {
-            cout << "WB ";
+        if(WBoper) {
             WBoper = false;
             destinationRegisterWB = destinationRegisterMEM;
             if(MEMopCode >= 0 && MEMopCode <= 15) {
@@ -237,14 +230,8 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                     destinationRegisterWB = -1;
                 }
                 stallType--;
-                runOnlyUpp++;
-                my_clock++;
-                if(stallType == 0) {
-                    runOnlyUpp = 1;
-                }
                 continue;
             }
-            cout << "WB ";
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -254,8 +241,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
-        if(MEMoper && !(runOnlyUpp > 4)) {
-            cout << "MEM ";
+        if(MEMoper) {
             WBoper = true;
             MEMoper = false;
             MEMopCode = EXopCode;
@@ -277,14 +263,8 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                 }
                 destinationRegisterEX = -1;
                 stallType--;
-                runOnlyUpp++;
-                my_clock++;
-                if(stallType == 0) {
-                    runOnlyUpp = 1;
-                }
                 continue;
             }
-            cout << "MEM ";
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -294,8 +274,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
-        if(EXoper && !(runOnlyUpp > 3)) {
-            cout << "EX ";
+        if(EXoper) {
             MEMoper = true;
             EXoper = false;
             EXopCode = opCode;
@@ -351,7 +330,6 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                     EXResult = add(registerSource1, this->registers[registerSource2]);
                 }
             }
-            cout << "EX ";
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -361,8 +339,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
-        if(IRoper && !(runOnlyUpp > 2)) {
-            cout << "ID/RF ";
+        if(IRoper) {
             opCode = bitToInt(currInstruction, 26, 31);
 
             if(opCode >= 0 && opCode <= 15) {
@@ -370,43 +347,29 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                 registerSource1 = bitToInt(currInstruction, 16, 20);
                 registerSource2 = bitToInt(currInstruction, 11, 15);
 
-                cout << "\nregisterDestination ==> " << registerDestination << endl;
-                cout << "registerSource1 ==> " << registerSource1 << endl;
-                cout << "registerSource2 ==> " << registerSource2 << endl;
-                cout << "destinationRegisterEX ==> " << destinationRegisterEX << endl;
-                cout << "destinationRegisterMEM ==> " << destinationRegisterMEM << endl;
-                cout << "destinationRegisterWB ==> " << destinationRegisterWB << endl;
-
                 if(destinationRegisterEX == registerSource1 || destinationRegisterEX == registerSource2) {
                     stallInstructionIndex.push_back(this->registers[0]);
                     if(WBoper && !MEMoper) {
-                        runOnlyUpp = 3;
                         totalStalls += 2;
                         stallType = 1;
                         destinationRegisterEX = -1;
                     }
                     else {
-                        runOnlyUpp = 3;
                         totalStalls += 3;
                         stallType = 2;
                     }
-                    my_clock++;
-                    // destinationRegisterEX = -1;
                     continue;
                 }
                 else if(destinationRegisterMEM == registerSource1 || destinationRegisterMEM == registerSource2) {
                     stallInstructionIndex.push_back(this->registers[0]);
-                    runOnlyUpp = 3;
                     totalStalls += 2;
                     stallType = 1;
-                    my_clock++;
-                    destinationRegisterEX = -1; //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    destinationRegisterEX = -1;
                     continue;
                 }
                 else if(destinationRegisterWB == registerSource1 || destinationRegisterWB == registerSource2) {
                     stallInstructionIndex.push_back(this->registers[0]);
                     totalStalls += 1;
-                    my_clock++;
                     continue;
                 }
                 this->registers[0]++;
@@ -416,45 +379,31 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                 registerDestination = bitToInt(currInstruction, 21, 25);
                 registerSource1 = bitToInt(currInstruction, 16, 20);
                 immediate = bitToInt(currInstruction, 0, 15);
-                
-                cout << "\nregisterDestination ==> " << registerDestination << endl;
-                cout << "registerSource1 ==> " << registerSource1 << endl;
-                cout << "immediate ==> " << immediate << endl;
-                cout << "destinationRegisterEX ==> " << destinationRegisterEX << endl;
-                cout << "destinationRegisterMEM ==> " << destinationRegisterMEM << endl;
-                cout << "destinationRegisterWB ==> " << destinationRegisterWB << endl;
 
                 if(opCode >= 17 && opCode <= 17) {
                     if(destinationRegisterEX == registerSource1) {
                         stallInstructionIndex.push_back(this->registers[0]);
                         if(WBoper && !MEMoper) {
-                            runOnlyUpp = 3;
                             totalStalls += 2;
                             stallType = 1;
                             destinationRegisterEX = -1;
                         }
                         else {
-                            runOnlyUpp = 3;
                             totalStalls += 3;
                             stallType = 2;
                         }
-                        my_clock++;
-                        // destinationRegisterEX = -1;
                         continue;
                     }
                     else if(destinationRegisterMEM == registerSource1) {
                         stallInstructionIndex.push_back(this->registers[0]);
-                        runOnlyUpp = 3;
                         totalStalls += 2;
                         stallType = 1;
-                        my_clock++;
                         destinationRegisterEX = -1;
                         continue;
                     }
                     else if(destinationRegisterWB == registerSource1) {
                         stallInstructionIndex.push_back(this->registers[0]);
                         totalStalls += 1;
-                        my_clock++;
                         continue;
                     }
                     this->registers[0]++;
@@ -463,31 +412,25 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                     if(destinationRegisterEX == registerSource1 || destinationRegisterEX == registerDestination) {
                         stallInstructionIndex.push_back(this->registers[0]);
                         if(WBoper && !MEMoper) {
-                            runOnlyUpp = 3;
                             totalStalls += 2;
                             stallType = 1;
                             destinationRegisterEX = -1;
                         }
                         else {
-                            runOnlyUpp = 3;
                             totalStalls += 3;
                             stallType = 2;
                         }
-                        my_clock++;
                         continue;
                     }
                     else if(destinationRegisterMEM == registerSource1 || destinationRegisterMEM == registerDestination) {
                         stallInstructionIndex.push_back(this->registers[0]);
-                        runOnlyUpp = 3;
                         totalStalls += 2;
                         stallType = 1;
-                        my_clock++;
                         continue;
                     }
                     else if(destinationRegisterWB == registerSource1 || destinationRegisterWB == registerDestination) {
                         stallInstructionIndex.push_back(this->registers[0]);
                         totalStalls += 1;
-                        my_clock++;
                         continue;
                     }
                     else {
@@ -501,11 +444,6 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
             else if(opCode >= 32 && opCode <= 47) {
                 immediate = bitToInt(currInstruction, 0, 15);
                 
-                cout << "\nimmediate ==> " << immediate << endl;
-                cout << "destinationRegisterEX ==> " << destinationRegisterEX << endl;
-                cout << "destinationRegisterMEM ==> " << destinationRegisterMEM << endl;
-                cout << "destinationRegisterWB ==> " << destinationRegisterWB << endl;
-                
                 stallInstructionIndex.push_back(this->registers[0]);
                 branchDec = true;
             }
@@ -515,42 +453,29 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                 registerSource1 = bitToInt(currInstruction, 16, 20);
                 registerSource2 = bitToInt(currInstruction, 11, 15);
 
-                cout << "\nregisterDestination ==> " << registerDestination << endl;
-                cout << "registerSource1 ==> " << registerSource1 << endl;
-                cout << "registerSource2 ==> " << registerSource2 << endl;
-                cout << "destinationRegisterEX ==> " << destinationRegisterEX << endl;
-                cout << "destinationRegisterMEM ==> " << destinationRegisterMEM << endl;
-                cout << "destinationRegisterWB ==> " << destinationRegisterWB << endl;
-
                 if(opCode == 49) {
                     if(destinationRegisterEX == registerSource2) {
                         stallInstructionIndex.push_back(this->registers[0]);
                         if(WBoper && !MEMoper) {
-                            runOnlyUpp = 3;
                             totalStalls += 2;
                             stallType = 1;
                             destinationRegisterEX = -1;
                         }
                         else {
-                            runOnlyUpp = 3;
                             totalStalls += 3;
                             stallType = 2;
                         }
-                        my_clock++;
                         continue;
                     }
                     else if(destinationRegisterMEM == registerSource2) {
                         stallInstructionIndex.push_back(this->registers[0]);
-                        runOnlyUpp = 3;
                         totalStalls += 2;
-                        stallType = 1;
-                        my_clock++;                    
+                        stallType = 1;                   
                         continue;
                     }
                     else if(destinationRegisterWB == registerSource2) {
                         stallInstructionIndex.push_back(this->registers[0]);
                         totalStalls += 1;
-                        my_clock++;
                         continue;
                     }
                 }
@@ -558,31 +483,25 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                     if(destinationRegisterEX == registerDestination || destinationRegisterEX == registerSource2) {
                         stallInstructionIndex.push_back(this->registers[0]);
                         if(WBoper && !MEMoper) {
-                            runOnlyUpp = 3;
                             totalStalls += 2;
                             stallType = 1;
                             destinationRegisterEX = -1;
                         }
                         else {
-                            runOnlyUpp = 3;
                             totalStalls += 3;
                             stallType = 2;
                         }
-                        my_clock++;
                         continue;
                     }
                     else if(destinationRegisterEX == registerDestination || destinationRegisterMEM == registerSource2) {
                         stallInstructionIndex.push_back(this->registers[0]);
-                        runOnlyUpp = 3;
                         totalStalls += 2;
                         stallType = 1;
-                        my_clock++;
                         continue;
                     }
                     else if(destinationRegisterEX == registerDestination || destinationRegisterWB == registerSource2) {
                         stallInstructionIndex.push_back(this->registers[0]);
                         totalStalls += 1;
-                        my_clock++;
                         continue;
                     }
                 }
@@ -591,7 +510,6 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
 
             EXoper = true;
             IRoper = false;
-            cout << "ID/RF ";
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -601,8 +519,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
-        if(IFoper && !(runOnlyUpp > 1)) {
-            cout << "IF ";
+        if(IFoper) {
             if(this->registers[0] < size) {
                 currInstruction = IF(encodedIns, this->registers[0]);
                 IRoper = true;
@@ -610,18 +527,13 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                     totalStalls++;
                     IRoper = false;
                     branchDec = false;
-                    my_clock++;
                     continue;
                 }
             }
             else {
                 IFoper = false;
             }
-            cout << "IF ";
         }
-
-
-        my_clock++;
     }
 }
 
