@@ -17,7 +17,7 @@ int main() {
 
     char *arr = new char[1500];
     ifstream obj;
-    obj.open("./bubble_sort.asm", ios::in);         // Enter filename
+    obj.open("./bubble_sort.asm", ios::in);         // Enter filename: ./Testing/t.asm  |   ./bubble_sort.asm   |   ./Testing/rigorous.asm
     obj.getline(arr, 100);
     int i = 0;
     for(i = 0; arr[i] != '\0'; i++);
@@ -57,8 +57,8 @@ int main() {
     cout << "------------------------------------------------------" << endl;
     processor.printMemory();
 
-    cout << "PROGRAM IS EXECUTED-" << endl;
-    processor.executeAll(encoder.encodedInstructions);
+    cout << "\n\nPROGRAM IS EXECUTED-" << endl;
+    processor.execute(encoder.encodedInstructions);
 
     cout << "------------------------------------------------------" << endl;
     cout << "REGISTERS:" << endl;

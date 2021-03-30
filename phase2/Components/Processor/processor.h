@@ -4,11 +4,16 @@
 using namespace std;
 
 #define max_memory_size 100
+#define initialValue -1
 
 class Processor {
     public:
         int registers[32];
         int *memory = new int[max_memory_size];
+
+        int my_clock = 0;
+        int totalStalls = 0;
+        vector<int> stallInstructionIndex;
 
         // INITIALIZE
         void initialiseRegisters();
@@ -19,25 +24,30 @@ class Processor {
         void setMemory(int index, int value);
 
         // R-TYPE
-        void add(int dr, int sr1, int sr2);
-        void sub(int dr, int sr1, int sr2);
+        int add(int sr1, int sr2);
+        int sub(int sr1, int sr2);
         // I-TYPE
-        void addi(int aa, int bb, int immediate);
-        void bne(int aa, int bb, int immediate);
-        void beq(int aa, int bb, int immediate);
-        void bgt(int aa, int bb, int immediate);
-        void bge(int aa, int bb, int immediate);
+        bool bne(int aa, int bb);
+        bool beq(int aa, int bb);
+        bool bgt(int aa, int bb);
+        bool bge(int aa, int bb);
         // J-TYPE
-        void jump(int immediate);
         // L-TYPE
         void ld(int dr, int Ain, int inc);
         void st(int dr, int Ain, int inc);
 
         // EXECUTE
-        void execute(struct bitIns inst);
-        void executeAll(vector<struct bitIns> encodedIns);
+        void execute(vector<struct bitIns> encodedIns);
 
         // PRINT
         void printRegisters();
         void printMemory();
+
+
+        // void execute(vector<struct bitIns> encodedIns);
+        void execute_noForwarding(vector<struct bitIns> encodedIns);
+        void execute_Forwarding(vector<struct bitIns> encodedIns);
+
+        struct bitIns IF(vector<struct bitIns> encodedIns, int index);
+        void printStalledInstructions();
 };
