@@ -208,6 +208,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(WBoper) {
+            this->totalInstructions++;
             WBoper = false;
             destinationRegisterWB = destinationRegisterMEM;
             if(MEMopCode >= 0 && MEMopCode <= 15) {
@@ -584,6 +585,7 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(WBoper) {
+            this->totalInstructions++;
             WBoper = false;
             destinationRegisterWB = destinationRegisterMEM;
         }
@@ -807,23 +809,36 @@ struct bitIns Processor::IF(vector<struct bitIns> encodedIns, int index) {
     return encodedIns[index];
 }
 
-void Processor::printStalledInstructions() {
-    int size = this->stallInstructionIndex.size();
-    if(size == 0) {
-        cout << "There were no stalls" << endl;
-    }
-    else {
-        cout << "The stalled instructions are:" << endl;
-        for(int i = 0; i < size; i++) {
-            cout << this->stallInstructionIndex[i] << " ";
-        }
-        cout << endl;
-    }
-}
-
 //////////////////////////////////////////////////////
 //  PRINT
 //////////////////////////////////////////////////////
+
+void Processor::cleanStallInstructions() {
+    int i = 1;
+    while(i < this->stallInstructionIndex.size()) {
+        int j = 0;
+        while(j < i) {
+            if(this->stallInstructionIndex[j] == this->stallInstructionIndex[i])
+                break;
+            j++;
+        }
+        if(j < i) {
+            vector<int>::iterator it;
+            it = this->stallInstructionIndex.begin() + i;
+            this->stallInstructionIndex.erase(it);
+            i--;
+        }
+        i++;
+    }
+}
+
+void Processor::print_information() {
+    cleanStallInstructions();
+    cout << "Total Number of stalls: " << this->totalStalls << endl;
+    cout << "Number of clock cycles required: " << this->my_clock << endl;
+    cout << "Total number of instructions: " << this->totalInstructions << endl;
+    cout << "Average instruction per cycle (IPC): " << ((float) this->totalInstructions / (float) this->my_clock) << endl << endl;
+}
 
 void Processor::printRegisters() {
     int i = 0;

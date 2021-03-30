@@ -178,13 +178,13 @@ void LexicalAnalyser::assignTypes() {
 
 }
 
-void LexicalAnalyser::printInstructions(vector<struct instruction> ins) {
-    int size = ins.size();
+void LexicalAnalyser::printInstructions() {
+    int size = this->instructions.size();
     for(int i = 0; i < size; i++) {
-        int n = ins[i].size;
+        int n = this->instructions[i].size;
         cout << i << ")\t";
         for(int j = 0; j < n; j++) {
-            cout << ins[i].lexeme[j].lexes;
+            cout << this->instructions[i].lexeme[j].lexes;
             cout << "\t";
         }
         cout << endl;
@@ -272,5 +272,18 @@ void LexicalAnalyser::replaceLabel(int insIndex, int value) {
     }
     else if(this->instructions[insIndex].lexeme[0].lexes[0] == 'J' && this->instructions[insIndex].lexeme[0].lexes[1] == 'U' && this->instructions[insIndex].lexeme[0].lexes[2] == 'M' && this->instructions[insIndex].lexeme[0].lexes[3] == 'P') {
         intToString(this->instructions[insIndex].lexeme[1].lexes, value);
+    }
+}
+
+void LexicalAnalyser::printStalledInstructions(vector<int> stallIndices) {
+    int size = stallIndices.size();
+    for(int i = 0; i < size; i++) {
+        int n = this->instructions[stallIndices[i]].size;
+        cout << stallIndices[i] << ")\t";
+        for(int j = 0; j < n; j++) {
+            cout << this->instructions[stallIndices[i]].lexeme[j].lexes;
+            cout << "\t";
+        }
+        cout << endl;
     }
 }

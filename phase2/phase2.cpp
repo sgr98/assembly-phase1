@@ -30,7 +30,7 @@ int main() {
     ////////////////////////////////////////////////////////////////////////////
     LexicalAnalyser LexAnl(arr);
     cout << "INSTRUCTIONS:" << endl;
-    LexAnl.printInstructions(LexAnl.instructions);
+    LexAnl.printInstructions();
     cout << "The number of instructions: " << LexAnl.instructions.size() << endl << endl;
     delete[] arr;
 
@@ -68,6 +68,11 @@ int main() {
     cout << "MEMORY:" << endl;
     cout << "------------------------------------------------------" << endl;
     processor.printMemory();
-
+    cout << "------------------------------------------------------" << endl;
+    cout << "DETAILS OF EXECUTION:" << endl;
+    cout << "------------------------------------------------------" << endl;
+    processor.print_information();
+    LexAnl.printStalledInstructions(processor.stallInstructionIndex);
+    
     return 0;
 }

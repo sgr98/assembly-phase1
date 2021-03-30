@@ -26,9 +26,10 @@ class LexicalAnalyser {
         void extract(char arr[1500]);
         vector<struct instruction> getInstructions(char arr[1000]);
         void assignTypes();
-        void printInstructions(vector<struct instruction> ins);
+        void printInstructions();
 
         void modifyInstructions();
         void eraseInstruction(int index);
-        void replaceLabel(int insIndex, int value);    
+        void replaceLabel(int insIndex, int value);
+        void printStalledInstructions(vector<int> stallIndices);
 };

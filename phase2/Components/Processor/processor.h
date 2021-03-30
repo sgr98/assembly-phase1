@@ -14,6 +14,7 @@ class Processor {
         int my_clock = 0;
         int totalStalls = 0;
         vector<int> stallInstructionIndex;
+        int totalInstructions = 0;
 
         // INITIALIZE
         void initialiseRegisters();
@@ -31,10 +32,6 @@ class Processor {
         bool beq(int aa, int bb);
         bool bgt(int aa, int bb);
         bool bge(int aa, int bb);
-        // J-TYPE
-        // L-TYPE
-        void ld(int dr, int Ain, int inc);
-        void st(int dr, int Ain, int inc);
 
         // EXECUTE
         void execute(vector<struct bitIns> encodedIns);
@@ -42,12 +39,12 @@ class Processor {
         // PRINT
         void printRegisters();
         void printMemory();
+        void print_information();
 
-
-        // void execute(vector<struct bitIns> encodedIns);
+        // PHASE2
         void execute_noForwarding(vector<struct bitIns> encodedIns);
         void execute_Forwarding(vector<struct bitIns> encodedIns);
 
         struct bitIns IF(vector<struct bitIns> encodedIns, int index);
-        void printStalledInstructions();
+        void cleanStallInstructions();
 };
