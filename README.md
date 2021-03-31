@@ -94,6 +94,22 @@ Example :
 >    
 > JUMP label1                     (line 43)   
 
+### Rules to use command line arguments:
+* The argument should contain the relative asm file location and attach it with the appropriate fileName.extension
+* The argumnent should be inputted while executing the file, i.e., while executing as given by the syntax on c++.
+
+EXample : 
+
+For Compiling: `g++ .\phase2.cpp .\Components\Processor\processor.cpp .\Components\LexicalAnalyser\lexical_analyser.cpp .\Components\Encoder\encoder.cpp -o phase2`
+
+For executing: `./phase2 ./FileLocation/fileName.extension`
+
+example: 
+1) `./phase2 ./Testing/t.asm`, 
+2) `./phase2 ./bubble_sort.asm` and
+3) `./phase2 ./Testing/rigorous.asm`.
+
+
 ### Pipeline Design (in c++):
 *The pipelining design is same for both: with and without forwarding, except for the stall cases which is also included within the necessary stage.*
 
