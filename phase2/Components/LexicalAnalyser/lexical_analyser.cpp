@@ -276,8 +276,10 @@ void LexicalAnalyser::replaceLabel(int insIndex, int value) {
 }
 
 void LexicalAnalyser::printStalledInstructions(vector<int> stallIndices) {
+    cout << "The instructions where stalls occured were:" << endl;
     int size = stallIndices.size();
-    for(int i = 0; i < size; i++) {
+    int inSize = this->instructions.size();
+    for(int i = 0; i < size && stallIndices[i] < inSize; i++) {
         int n = this->instructions[stallIndices[i]].size;
         cout << stallIndices[i] << ")\t";
         for(int j = 0; j < n; j++) {

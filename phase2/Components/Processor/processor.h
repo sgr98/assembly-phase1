@@ -3,7 +3,7 @@
 #include <bitset>
 using namespace std;
 
-#define max_memory_size 100
+#define max_memory_size 1000
 #define initialValue -1
 
 class Processor {

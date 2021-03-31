@@ -147,21 +147,6 @@ void Processor::execute(vector<struct bitIns> encodedIns) {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-
-
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -298,30 +283,35 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                         this->registers[0] += immediate;
                     else
                         this->registers[0]++;
+                    stallInstructionIndex.push_back(this->registers[0]);
                 }
                 else if(EXopCode == 19) {
                     if(beq(registerDestination, registerSource1))
                         this->registers[0] += immediate;
                     else
                         this->registers[0]++;
+                    stallInstructionIndex.push_back(this->registers[0]);
                 }
                 else if(EXopCode == 20) {
                     if(bgt(registerDestination, registerSource1))
                         this->registers[0] += immediate;
                     else
                         this->registers[0]++;
+                    stallInstructionIndex.push_back(this->registers[0]);
                 }
                 else if(EXopCode == 21) {
                     if(bge(registerDestination, registerSource1))
                         this->registers[0] += immediate;
                     else
                         this->registers[0]++;
+                    stallInstructionIndex.push_back(this->registers[0]);
                 }
             }
             else if(EXopCode >= 32 && EXopCode <= 47) {
                 if(EXopCode == 33) {
                     this->registers[0] += immediate;
                 }
+                stallInstructionIndex.push_back(this->registers[0]);
             }
             else if(EXopCode >= 48 && EXopCode <= 63) {
                 if(EXopCode == 49) {
@@ -435,7 +425,6 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                         continue;
                     }
                     else {
-                        stallInstructionIndex.push_back(this->registers[0]);
                         branchDec = true;
                     }
                 }
@@ -444,8 +433,6 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
 
             else if(opCode >= 32 && opCode <= 47) {
                 immediate = bitToInt(currInstruction, 0, 15);
-                
-                stallInstructionIndex.push_back(this->registers[0]);
                 branchDec = true;
             }
 
@@ -646,30 +633,35 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
                         this->registers[0] += immediate;
                     else
                         this->registers[0]++;
+                    stallInstructionIndex.push_back(this->registers[0]);
                 }
                 else if(EXopCode == 19) {
                     if(beq(registerDestination, registerSource1))
                         this->registers[0] += immediate;
                     else
                         this->registers[0]++;
+                    stallInstructionIndex.push_back(this->registers[0]);
                 }
                 else if(EXopCode == 20) {
                     if(bgt(registerDestination, registerSource1))
                         this->registers[0] += immediate;
                     else
                         this->registers[0]++;
+                    stallInstructionIndex.push_back(this->registers[0]);
                 }
                 else if(EXopCode == 21) {
                     if(bge(registerDestination, registerSource1))
                         this->registers[0] += immediate;
                     else
                         this->registers[0]++;
+                    stallInstructionIndex.push_back(this->registers[0]);
                 }
             }
             else if(EXopCode >= 32 && EXopCode <= 47) {
                 if(EXopCode == 33) {
                     this->registers[0] += immediate;
                 }
+                stallInstructionIndex.push_back(this->registers[0]);
             }
             else if(EXopCode >= 48 && EXopCode <= 63) {
                 if(EXopCode == 49) {
@@ -740,15 +732,12 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
                             continue;
                         }
                     }
-                    stallInstructionIndex.push_back(this->registers[0]);
                     branchDec = true;
                 }
             }
 
             else if(opCode >= 32 && opCode <= 47) {
                 immediate = bitToInt(currInstruction, 0, 15);
-                
-                stallInstructionIndex.push_back(this->registers[0]);
                 branchDec = true;
             }
 
