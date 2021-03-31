@@ -10,14 +10,14 @@ using namespace std;
 //  COMPILE THIS:
 //  g++ .\phase2.cpp .\Components\Processor\processor.cpp .\Components\LexicalAnalyser\lexical_analyser.cpp .\Components\Encoder\encoder.cpp -o phase2
 
-int main() {
+int main(int argc, char** argv) {
     Processor processor;
     processor.initialiseRegisters();
 
 
     char *arr = new char[1500];
     ifstream obj;
-    obj.open("./bubble_sort.asm", ios::in);         // Enter filename: ./Testing/t.asm  |   ./bubble_sort.asm   |   ./Testing/rigorous.asm
+    obj.open(argv[1], ios::in);         // Enter filename: ./Testing/t.asm  |   ./bubble_sort.asm   |   ./Testing/rigorous.asm
     obj.getline(arr, 100);
     int i = 0;
     for(i = 0; arr[i] != '\0'; i++);
