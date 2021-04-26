@@ -1,60 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "./lexical_analyser.h"
-
-bool isVisibleCharacter(char c) {
-    if( c > (char) 32)
-        return true;
-    return false;
-}
-
-bool compare(char *arr, char *brr) {
-    int i = 0;
-    while(brr[i] != '\0' && brr[i] == *(arr + i)) {
-        i++;
-    }
-    if(brr[i] == '\0')
-        return true;
-    return false;
-}
-
-void intToString(char s[10], int val) {
-    int j = 0;
-    if(val == 0) {
-        s[0] = '0';
-        s[1] = '\0';
-        j++;
-    }
-    else if(val > 0) {
-        while(val > 0) {
-            int dig = val % 10;
-            char c = (char) (dig + 48);
-            s[j] = c;
-            j++;
-            val /= 10;
-        }
-        s[j] = '\0';
-    }
-    else {
-        val *= -1;
-        while(val > 0) {
-            int dig = val % 10;
-            char c = (char) (dig + 48);
-            s[j] = c;
-            j++;
-            val /= 10;
-        }
-        s[j] = '-';
-        j++;
-        s[j] = '\0';
-    }
-
-    for(int i = 0; i < j / 2; i++) {
-        char temp = s[i];
-        s[i] = s[j - i - 1];
-        s[j - i - 1] = temp;
-    }
-}
+#include "./../../Extras/functions.h"
 
 LexicalAnalyser::LexicalAnalyser(char a[1500]) {
     extract(a);

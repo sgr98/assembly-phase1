@@ -12,9 +12,6 @@ struct instruction {
     int size = 0;
 };
 
-bool isVisibleCharacter(char c);
-void intToString(char *s, int val);
-
 class LexicalAnalyser {
     public:
         char Initialise[500];
