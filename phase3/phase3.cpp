@@ -8,7 +8,9 @@
 using namespace std;
 
 //  COMPILE THIS:
-//  g++ .\phase2.cpp .\Components\Processor\processor.cpp .\Components\LexicalAnalyser\lexical_analyser.cpp .\Components\Encoder\encoder.cpp -o phase2
+//  g++ .\phase3.cpp .\Components\Processor\processor.cpp .\Components\LexicalAnalyser\lexical_analyser.cpp .\Components\Encoder\encoder.cpp -o phase3
+//  EXECUTE THIS:
+//  ./Sample/bubble_sort.asm
 
 int main(int argc, char** argv) {
     Processor processor;
