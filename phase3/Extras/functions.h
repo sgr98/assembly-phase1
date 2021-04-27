@@ -2,6 +2,10 @@
 #include <vector>
 using namespace std;
 
+void getInts(int *cacheSpecis, char *str);
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool isVisibleCharacter(char c);
 bool compare(char *arr, char *brr);
 void intToString(char *s, int val);

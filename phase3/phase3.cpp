@@ -2,20 +2,21 @@
 #include <fstream>
 #include <string>
 
+#include "./Extras/functions.h"
 #include "./Components/LexicalAnalyser/lexical_analyser.h"
 #include "./Components/Encoder/encoder.h"
 #include "./Components/Processor/processor.h"
 using namespace std;
 
 //  COMPILE THIS:
-//  g++ .\phase3.cpp .\Extras\functions.cpp .\Components\Processor\processor.cpp .\Components\LexicalAnalyser\lexical_analyser.cpp .\Components\Encoder\encoder.cpp -o phase3
+//  g++ .\phase3.cpp .\Extras\functions.cpp .\Components\Processor\Memory\memory.cpp .\Components\Processor\processor.cpp .\Components\LexicalAnalyser\lexical_analyser.cpp .\Components\Encoder\encoder.cpp -o phase3
 //  EXECUTE THIS:
 //  ./phase3 ./Sample/cache_specs.txt ./Sample/bubble_sort.asm
 
 int main(int argc, char** argv) {
     ifstream obj;
     //  Getting the cache_specs.txt
-    char *specis = new char[50];
+    char *specis = new char[100];
     obj.open(argv[1], ios::in);
     obj.getline(specis, 100);
     int i = 0;
@@ -23,6 +24,15 @@ int main(int argc, char** argv) {
     specis[i] = '\n';
     obj.read((specis + i + 1), 900);
     obj.close();
+
+    //  Getting cache specifications in integer format
+    int *cacheSpecis = new int[9];
+    getInts(cacheSpecis, specis);
+    for(int k = 0; k < 9; k++)
+        cout << cacheSpecis[k] << " ";
+    cout << endl;
+    // cout << getInts(specis);
+    delete[] specis;
 
 
     Processor processor;
@@ -49,7 +59,9 @@ int main(int argc, char** argv) {
     delete[] arr;
 
     //  Initialising memory according to the file
-    processor.initialiseMemory(LexAnl.memSetups);
+    processor.initialiseMemory(LexAnl.memSetups, cacheSpecis[3], cacheSpecis[0], cacheSpecis[4], cacheSpecis[1], cacheSpecis[5], cacheSpecis[2]);
+    processor.memory.setLatency(cacheSpecis[8], cacheSpecis[6], cacheSpecis[7]);
+    processor.memory.printSpecifications();
 
     // cout << "xxxxxxxxxxxxxxxxx" << endl;
     // LexAnl.printInstructions(LexAnl.memSetups);

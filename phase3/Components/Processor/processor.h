@@ -1,15 +1,15 @@
 #include <iostream>
 #include <vector>
 #include <bitset>
+#include "./Memory/memory.h"
 using namespace std;
-
-#define max_memory_size 1024
 #define initialValue -1
 
 class Processor {
     public:
+        Memory memory;
+
         int registers[32];
-        int *memory = new int[max_memory_size];
 
         int my_clock = 0;
         int totalStalls = 0;
@@ -17,12 +17,12 @@ class Processor {
         int totalInstructions = 0;
 
         // INITIALIZE
+        void init(int rSize, int cSize1, int assoc1, int cSize2, int assoc2, int blkSize);
         void initialiseRegisters();
-        void initialiseMemory(vector<struct instruction> memSetups);
+        void initialiseMemory(vector<struct instruction> memSetups, int rSize, int cSize1, int assoc1, int cSize2, int assoc2, int blkSize);
 
         // SET
         void setRegister(int index, int value);
-        void setMemory(int index, int value);
 
         // R-TYPE
         int add(int sr1, int sr2);

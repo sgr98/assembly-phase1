@@ -5,11 +5,15 @@
 #include "./processor.h"
 #include "./../Encoder/encoder.h"
 #include "./../LexicalAnalyser/lexical_analyser.h"
+// #include "./Memory/memory.h"
 using namespace std;
 
 //////////////////////////////////////////////////////
 //  INITIALIZE
 //////////////////////////////////////////////////////
+void Processor::init(int rSize, int cSize1, int assoc1, int cSize2, int assoc2, int blkSize) {
+    this->memory.initialise(rSize, cSize1, assoc1, cSize2, assoc2, blkSize);
+}
 
 void Processor::initialiseRegisters() {
     for(int i = 0; i < 32; i++) {
@@ -17,16 +21,13 @@ void Processor::initialiseRegisters() {
     }
 }
 
-void Processor::initialiseMemory(vector<struct instruction> memInits) {
-    for(int i = 0; i < max_memory_size; i++) {
-        this->memory[i] = 0;
-    }
-
+void Processor::initialiseMemory(vector<struct instruction> memInits, int rSize, int cSize1, int assoc1, int cSize2, int assoc2, int blkSize) {
+    init(rSize, cSize1, assoc1, cSize2, assoc2, blkSize);
     int size = memInits.size();
     for(int i = 0; i < size; i++) {
         int index = strToInt(memInits[i].lexeme[0].lexes);
         int value = strToInt(memInits[i].lexeme[2].lexes);
-        this->memory[index] = value;
+        this->memory.ram.setMemory(index, value);
     }
 }
 
@@ -36,10 +37,6 @@ void Processor::initialiseMemory(vector<struct instruction> memInits) {
 
 void Processor::setRegister(int index, int value) {
     this->registers[index] = value;
-}
-
-void Processor::setMemory(int index, int value) {
-    this->memory[index] = value;
 }
 
 //////////////////////////////////////////////////////
@@ -193,10 +190,10 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
 
             if(MEMopCode >= 48 && MEMopCode <= 63) {
                 if(MEMopCode == 49) {
-                    setRegister(destinationRegisterMEM, this->memory[MEMResult]);
+                    setRegister(destinationRegisterMEM, this->memory.ram.rdata[MEMResult]);
                 }
                 else if(MEMopCode == 50) {
-                    setMemory(MEMResult, this->registers[destinationRegisterMEM]);
+                    this->memory.ram.setMemory(MEMResult, this->registers[destinationRegisterMEM]);
                 }
             }
 
@@ -550,10 +547,10 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
 
             if(MEMopCode >= 48 && MEMopCode <= 63) {
                 if(MEMopCode == 49) {
-                    setRegister(destinationRegisterMEM, this->memory[MEMResult]);
+                    setRegister(destinationRegisterMEM, this->memory.ram.rdata[MEMResult]);
                 }
                 else if(MEMopCode == 50) {
-                    setMemory(MEMResult, this->registers[destinationRegisterMEM]);
+                    this->memory.ram.setMemory(MEMResult, this->registers[destinationRegisterMEM]);
                 }
             }
 
@@ -798,14 +795,15 @@ void Processor::printRegisters() {
 
 void Processor::printMemory() {
     int i = 0;
-    while(i < max_memory_size) {
-        cout << "A" << i << " = " << this->memory[i] << "\t\t\t";
+    // cout << this->memory.ram.ramSize << endl;
+    while(i < this->memory.ram.ramSize) {
+        cout << "A" << i << " = " << this->memory.ram.rdata[i] << "\t\t\t";
         i++;
-        cout << "A" << i << " = " << this->memory[i] << "\t\t\t";
+        cout << "A" << i << " = " << this->memory.ram.rdata[i] << "\t\t\t";
         i++;
-        cout << "A" << i << " = " << this->memory[i] << "\t\t\t";
+        cout << "A" << i << " = " << this->memory.ram.rdata[i] << "\t\t\t";
         i++;
-        cout << "A" << i << " = " << this->memory[i];
+        cout << "A" << i << " = " << this->memory.ram.rdata[i];
         i++;
         cout << endl;
     }

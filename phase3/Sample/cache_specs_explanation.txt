@@ -1,5 +1,6 @@
 <L1 cache_size> <L2 cache_size>
 <block_size>
+<memory_size>
 <L1 associativity> <L2 associativity>
 <L1 access latency> <L2 access latency>
 <Memory access latency>
