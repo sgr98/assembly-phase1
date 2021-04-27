@@ -10,18 +10,30 @@ using namespace std;
 //  COMPILE THIS:
 //  g++ .\phase3.cpp .\Extras\functions.cpp .\Components\Processor\processor.cpp .\Components\LexicalAnalyser\lexical_analyser.cpp .\Components\Encoder\encoder.cpp -o phase3
 //  EXECUTE THIS:
-//  ./phase3 ./Sample/bubble_sort.asm
+//  ./phase3 ./Sample/cache_specs.txt ./Sample/bubble_sort.asm
 
 int main(int argc, char** argv) {
+    ifstream obj;
+    //  Getting the cache_specs.txt
+    char *specis = new char[50];
+    obj.open(argv[1], ios::in);
+    obj.getline(specis, 100);
+    int i = 0;
+    for(i = 0; specis[i] != '\0'; i++);
+    specis[i] = '\n';
+    obj.read((specis + i + 1), 900);
+    obj.close();
+
+
     Processor processor;
     processor.initialiseRegisters();
 
 
+    //  Getting the bubble_sort.asm
     char *arr = new char[1500];
-    ifstream obj;
-    obj.open(argv[1], ios::in);         // Enter filename: ./Testing/t.asm  |   ./bubble_sort.asm   |   ./Testing/rigorous.asm
+    obj.open(argv[2], ios::in);         // Enter filename: ./Testing/t.asm  |   ./bubble_sort.asm   |   ./Testing/rigorous.asm
     obj.getline(arr, 100);
-    int i = 0;
+    i = 0;
     for(i = 0; arr[i] != '\0'; i++);
     arr[i] = '\n';
     obj.read((arr + i + 1), 900);
