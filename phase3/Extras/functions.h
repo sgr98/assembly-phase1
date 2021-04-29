@@ -3,6 +3,8 @@
 using namespace std;
 
 void getInts(int *cacheSpecis, char *str);
+int my_log2(int num);
+int my_pow2(int num);
 
 ////////////////////////////////////////////////////////////////////////////////
 

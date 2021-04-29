@@ -28,10 +28,6 @@ int main(int argc, char** argv) {
     //  Getting cache specifications in integer format
     int *cacheSpecis = new int[9];
     getInts(cacheSpecis, specis);
-    for(int k = 0; k < 9; k++)
-        cout << cacheSpecis[k] << " ";
-    cout << endl;
-    // cout << getInts(specis);
     delete[] specis;
 
 

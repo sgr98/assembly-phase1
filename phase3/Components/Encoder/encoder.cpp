@@ -128,7 +128,7 @@ struct bitIns Encoder::encode(struct instruction ins) {
         }
         i = 0;
         d = 1;
-        n = strToInt(ins.lexeme[2].lexes);
+        n = strToInt(ins.lexeme[3].lexes);
         while(i < 5) {
             bin.word[16 + i] = n & d;
             d = d << 1;
@@ -136,9 +136,9 @@ struct bitIns Encoder::encode(struct instruction ins) {
         }
         i = 0;
         d = 1;
-        n = strToInt(ins.lexeme[3].lexes);
-        while(i < 5) {
-            bin.word[11 + i] = n & d;
+        n = strToInt(ins.lexeme[2].lexes);
+        while(i < 16) {
+            bin.word[i] = n & d;
             d = d << 1;
             i++;
         }

@@ -147,6 +147,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(WBoper) {
+            // cout << "5\n";
             this->totalInstructions++;
             WBoper = false;
             destinationRegisterWB = destinationRegisterMEM;
@@ -182,6 +183,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(MEMoper) {
+            // cout << "4\n";
             WBoper = true;
             MEMoper = false;
             MEMopCode = EXopCode;
@@ -190,6 +192,11 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
 
             if(MEMopCode >= 48 && MEMopCode <= 63) {
                 if(MEMopCode == 49) {
+                    cout << "\nClock: " << my_clock << "\taddress: " << MEMResult << endl;
+                    cout << "Type of stall: " << this->memory.getData(MEMResult) << endl;
+                    cout << "|||||||||||||||||||||||||||||||||||||||\n";
+                    this->memory.printCache();
+                    cout << "|||||||||||||||||||||||||||||||||||||||\n";
                     setRegister(destinationRegisterMEM, this->memory.ram.rdata[MEMResult]);
                 }
                 else if(MEMopCode == 50) {
@@ -215,6 +222,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(EXoper) {
+            // cout << "3\n";
             MEMoper = true;
             EXoper = false;
             EXopCode = opCode;
@@ -275,6 +283,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                     EXResult = add(registerSource1, this->registers[registerSource2]);
                 }
             }
+            // cout << "EXResult: " << EXResult << endl;
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -285,6 +294,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(IRoper) {
+            // cout << "2\n";
             opCode = bitToInt(currInstruction, 26, 31);
 
             if(opCode >= 0 && opCode <= 15) {
@@ -392,8 +402,8 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
 
             else if(opCode >= 48 && opCode <= 63) {
                 registerDestination = bitToInt(currInstruction, 21, 25);
-                registerSource1 = bitToInt(currInstruction, 16, 20);
-                registerSource2 = bitToInt(currInstruction, 11, 15);
+                registerSource1 = bitToInt(currInstruction, 0, 15);
+                registerSource2 = bitToInt(currInstruction, 16, 20);
 
                 if(opCode == 49) {
                     if(destinationRegisterEX == registerSource2) {
@@ -462,6 +472,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(IFoper) {
+            // cout << "1\n";
             if(this->registers[0] < size) {
                 currInstruction = IF(encodedIns, this->registers[0]);
                 IRoper = true;
@@ -517,6 +528,7 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
 
     while(IFoper || IRoper || EXoper || MEMoper || WBoper) {
         my_clock++;
+        cout << "Clock: " << my_clock << endl;
 
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
@@ -526,6 +538,7 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(WBoper) {
+            cout << "5\n";
             this->totalInstructions++;
             WBoper = false;
             destinationRegisterWB = destinationRegisterMEM;
@@ -539,11 +552,13 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(MEMoper) {
+            cout << "4\n";
             WBoper = true;
             MEMoper = false;
             MEMopCode = EXopCode;
             destinationRegisterMEM = destinationRegisterEX;
             MEMResult = EXResult;
+            cout << "address: " << MEMResult << endl;
 
             if(MEMopCode >= 48 && MEMopCode <= 63) {
                 if(MEMopCode == 49) {
@@ -564,6 +579,7 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(EXoper) {
+            cout << "3\n";
             EXopCode = opCode;
             destinationRegisterEX = registerDestination;
             
@@ -629,6 +645,7 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
             if(EXopCode == 49) {
                 loadDec = true;
             }
+            cout << "EXResult: " << EXResult << endl;
 
             MEMoper = true;
             EXoper = false;
@@ -642,6 +659,7 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(IRoper) {
+            cout << "2\n";
             opCode = bitToInt(currInstruction, 26, 31);
 
             if(opCode >= 0 && opCode <= 15) {
@@ -697,8 +715,8 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
 
             else if(opCode >= 48 && opCode <= 63) {
                 registerDestination = bitToInt(currInstruction, 21, 25);
-                registerSource1 = bitToInt(currInstruction, 16, 20);
-                registerSource2 = bitToInt(currInstruction, 11, 15);
+                registerSource1 = bitToInt(currInstruction, 0, 15);
+                registerSource2 = bitToInt(currInstruction, 16, 20);
 
                 if(loadDec) {
                     loadDec = false;
@@ -731,6 +749,7 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
         ////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////
         if(IFoper) {
+            cout << "1\n";
             if(this->registers[0] < size) {
                 currInstruction = IF(encodedIns, this->registers[0]);
                 IRoper = true;

@@ -1,19 +1,20 @@
 #include<iostream>
 using namespace std;
-#include "./../Components/Processor/Memory/memory.h"
+// #include "./../Components/Processor/Memory/memory.h"
+
+void change(bool *x, bool *y) {
+    *x = 0;
+    *y = 1;
+}
 
 int main() {
-    int n;
-    cin >> n;
+    bool a = 1;
+    bool b = 0;
 
-    Memory memory;
-    memory.initialise(1024, 64, 2, 256, 4, 4);
-    
-    memory.ram.rdata[9] = 8;
-    cout << memory.ram.rdata[9];
-    RAM ram;
-    ram.initialise(1024, 4);
+    change(&a, &b);
 
+    cout << a << endl;
+    cout << b << endl;
 
     return 0;
 }
