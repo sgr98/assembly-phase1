@@ -438,8 +438,8 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
 
             else if(opCode >= 48 && opCode <= 63) {
                 registerDestination = bitToInt(currInstruction, 21, 25);
-                registerSource1 = bitToInt(currInstruction, 16, 20);
-                registerSource2 = bitToInt(currInstruction, 11, 15);
+                registerSource1 = bitToInt(currInstruction, 0, 15);
+                registerSource2 = bitToInt(currInstruction, 16, 20);
 
                 if(opCode == 49) {
                     if(destinationRegisterEX == registerSource2) {
@@ -743,8 +743,8 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
 
             else if(opCode >= 48 && opCode <= 63) {
                 registerDestination = bitToInt(currInstruction, 21, 25);
-                registerSource1 = bitToInt(currInstruction, 16, 20);
-                registerSource2 = bitToInt(currInstruction, 11, 15);
+                registerSource1 = bitToInt(currInstruction, 0, 15);
+                registerSource2 = bitToInt(currInstruction, 16, 20);
 
                 if(loadDec) {
                     loadDec = false;
