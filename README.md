@@ -1,5 +1,5 @@
 # PROJECT ON ARCHITECTURE
-## PHASE 1
+## PHASE 1 (Initiating the architecture)
 
 ### Architecture:
 * Memory availaible is an integer array of size 1000, thus there is 4kB memory.
@@ -65,7 +65,7 @@ L-TYPE:
 
 `ST R1, A0, R3` means `A0[R3] = R1  OR  A[0 + R3] = R1`
 
-## PHASE 2
+## PHASE 2 (Adding the Pipeline)
 
 ### Label feature added:
 Now **labels** can be added instead of putting actual values of line difference in **branch** and **jump** instructions.
@@ -138,3 +138,35 @@ Whenever the WB stage is executed, the WB boolean is set to *false*.
 * EX: Depending on the opcode, it may perform arithmetic or comparative operation. It also updates the PC_value for branch and jump instruction in the same stage.
 * MEM: It updates or fetches the value of or from memory from or into the register depending on store or load instruction.
 * WB: It updates the value of the destination register depending on the instruction.
+
+## PHASE 3 (Caching the processor)  
+
+### Details about the MEMORY:  
+* The architecture possesses 2 levels of cache: L1 and L2. 
+* The L1 cache is faster to access and smaller in size whereas the L2 cache is slower compared to L1 but bigger in size.
+* Both of them are set-associative which can be converted to either direct mapping or fully associative mapping depending on the values set in "cache_specs.txt" inside "Sample" directory.
+* Both caches implement LRU (Least-Recently Used) policy to maintain blocks in the cache.
+* LRU is implemented using a integer array of array_size equal to the total number of lines in the cache.
+  * `Totla Number of Lines = Cache_Size / Block_Size`
+* Physically the number of bits in a LRU would be equal to the `Log2(Number of Lines per Set)`
+  * `Number of Lines per Set = Total_number_of_lines / Total_number_of_sets = associativity`
+  * `Total_number_of_sets = Total_Number_of_lines / associativity`
+* The cache also contains a tag array of same array_size as LRU which contains tag bits (integer array to contain the total value of bits instead of actually storing individual bits).
+* During the MEM Stage, the address is first searched in the L1. 
+  * If found, the data is returned. 
+  * If not, then the same is repeated for L2. 
+  * If address is not found in L2 then the block of data is requested from main memory.
+  * Then the data is stored in L1 following the set-associative property and if a data is expunged from L1 and stored in L2.
+* The caches are partially Exclusive.
+  * If a data is expunged from L1, it is stored in L2.
+  * If a data is expunged from L2, it is completely removed.
+  * A data from the main memory is requested and stored only in L1 and not in L2.
+* The cache follow a Write-Through policy to have a good reliabiliyt of storing data into the main memory. That is when a STORE instruction is called, then it's data is modified in all the locations where the address exists, i.e., L1, L2 and main memory in one stage.
+
+
+### Incorporating cache into Pipeline:
+* After going through different cases, we can say that by incorporating cache and memory latency, the whole pipeline is stalled until the data is fetched from the cache or memory.
+* This made it easy to incorporate it into the pipleine as the only changes in code we had to made was in the MEM stage for both Executions, with and without data forwarding.
+* Thus we simply added the total latency and made a for loop to increase 'my_clock'. This is done in order to simulate the whole latency problem.
+* This is same for both Load and Store operations.
+* Details of the cases are present in "./phase3/Testing/P3.xlsx".
