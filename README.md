@@ -11,23 +11,17 @@
 * The types of instructions used are R, I, J, L.
 * The branch and jump instructions do not use labels, rather it uses an immediate value which is calculated as the difference between the line where the label would have been and the line where the instruction contains that label.
 Example :
-> ADD R1, R2, R3                  (line 15)
-> 
-> ...
->            
-> ...
->    
-> JUMP -28                        (line 43)   
+> ADD R1, R2, R3                  (line 15)  
+> ...           
+> ...  
+> JUMP -28                        (line 43)  
 
 instead of-
 
-> label: ADD R1, R2, R3     (line 15)   
-> 
-> ...
-> 
-> ...
-> 
-> JUMP label                (line 43)
+> label: ADD R1, R2, R3     (line 15)  
+> ...  
+> ...  
+> JUMP label                (line 43)  
 
 This is so because JUMP is storing (15 - 43) instead of using a label.
 * Note: Do not leave a space after the final operand, immediately press enter after the last operand
@@ -84,15 +78,11 @@ Now **labels** can be added instead of putting actual values of line difference 
 * The to-label should be accompanied by a colon, ":", at the end of the label, like in normal mips.
 
 Example :
-> lable1:                         (line 14)
->
-> ADD R1, R2, R3                  (line 15)
-> 
-> ...
->            
-> ...
->    
-> JUMP label1                     (line 43)   
+> lable1:                         (line 14)  
+> ADD R1, R2, R3                  (line 15)  
+> ...  
+> ...  
+> JUMP label1                     (line 43)  
 
 ### Rules to use command line arguments:
 * The argument should contain the relative asm file location and attach it with the appropriate fileName.extension
