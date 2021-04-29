@@ -13,6 +13,11 @@ class Processor {
 
         int my_clock = 0;
         int totalStalls = 0;
+
+        int memoryAccesses = 0;
+        int L1misses = 0;
+        int L2misses = 0;
+
         vector<int> stallInstructionIndex;
         int totalInstructions = 0;
 

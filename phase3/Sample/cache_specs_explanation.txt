@@ -4,3 +4,7 @@
 <L1 associativity> <L2 associativity>
 <L1 access latency> <L2 access latency>
 <Memory access latency>
+
+Note:
+If latency = 1; There is no stall
+If latency = 2; There is one stall cycle

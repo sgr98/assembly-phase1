@@ -94,6 +94,7 @@ int main(int argc, char** argv) {
     cout << "DETAILS OF EXECUTION:" << endl;
     cout << "------------------------------------------------------" << endl;
     processor.print_information();
+    cout << "------------------------------------------------------" << endl;
     LexAnl.printStalledInstructions(processor.stallInstructionIndex);
     
     return 0;
