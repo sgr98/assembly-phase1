@@ -311,3 +311,35 @@ void Memory::printCache() {
     this->L2.printCacheData(this->blockSize);
     cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\n";
 }
+
+int Memory::writeMemory(int address, int value, bool *L1miss, bool *L2miss) {
+    //  Write-through approach
+    *L1miss = false;
+    *L2miss = false;
+    int latency = 0;
+    int L1find = this->L1.search(address, this->blockSize);
+    if(L1find != -1) {  //  Write L1 cahce if present
+        int off = address % my_pow2(this->offset);
+        this->L1.cdata[L1find][off] = value;
+        // this->L1.dirty[L1find] = true;
+    }
+    else {
+        *L1miss = true;
+    }
+    latency += this->L1.clatency;
+
+    int L2find = this->L2.search(address, this->blockSize);
+    if(L2find != -1) {  //  Write L2 cahce if present
+        int off = address % my_pow2(this->offset);
+        this->L2.cdata[L2find][off] = value;
+        // this->L2.dirty[L1find] = true;
+    }
+    else {
+        *L2miss = true;
+    }
+    latency += this->L2.clatency;
+
+    latency += this->ram.rlatency;
+    this->ram.setMemory(address, value);      //  Write Memory
+    return latency;
+}

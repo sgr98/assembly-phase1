@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 
     //  Getting the bubble_sort.asm
     char *arr = new char[1500];
-    obj.open(argv[2], ios::in);         // Enter filename: ./Testing/t.asm  |   ./bubble_sort.asm   |   ./Testing/rigorous.asm
+    obj.open(argv[2], ios::in);         // Enter filename: ./Testing/t.asm  |   ./Sample/bubble_sort.asm   |   ./Testing/rigorous.asm
     obj.getline(arr, 100);
     i = 0;
     for(i = 0; arr[i] != '\0'; i++);

@@ -42,6 +42,7 @@ class Cache {
         Cache();
         void initialise(int cSize, int assoc, int blkSize, int addressBits);
         void setLatency(int ltc);
+
         int search(int address, int blockSize);
         int insertData(int blockNum, int *blockData, int blockSize);
         void printCacheData(int blockSize);
@@ -66,4 +67,6 @@ class Memory {
         int getData(int address);
         int search(int address, bool *L1ser, bool *L2ser);
         void printCache();
+
+        int writeMemory(int address, int value, bool *L1miss, bool *L2miss);
 };

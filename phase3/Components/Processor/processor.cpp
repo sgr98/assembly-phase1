@@ -190,6 +190,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
 
             if(MEMopCode >= 48 && MEMopCode <= 63) {
                 this->memoryAccesses++;
+
                 if(MEMopCode == 49) {
                     int find = this->memory.getData(MEMResult);
                     int totalMemLatency = 0;
@@ -209,6 +210,7 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
                         totalMemLatency += this->memory.ram.rlatency;
                     }
 
+                    //  MEMORY STALLS REQUIRED 
                     for(int j = 1; j < totalMemLatency; j++) {
                         this->my_clock++;
                         this->totalStalls++;
@@ -216,8 +218,24 @@ void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
 
                     setRegister(destinationRegisterMEM, this->memory.ram.rdata[MEMResult]);
                 }
+
                 else if(MEMopCode == 50) {
-                    this->memory.ram.setMemory(MEMResult, this->registers[destinationRegisterMEM]);
+                    bool L1miss = false;
+                    bool L2miss = false;
+                    int totalMemLatency = this->memory.writeMemory(MEMResult, this->registers[destinationRegisterMEM], &L1miss, &L2miss);                    
+
+                    if(L1miss) {
+                        this->L1misses++;
+                    }
+                    if(L2miss) {
+                        this->L2misses++;
+                    }
+
+                    //  MEMORY STALLS REQUIRED
+                    for(int j = 1; j < totalMemLatency; j++) {
+                        this->my_clock++;
+                        this->totalStalls++;
+                    }
                 }
             }
 
@@ -599,7 +617,22 @@ void Processor::execute_Forwarding(vector<struct bitIns> encodedIns) {
                     setRegister(destinationRegisterMEM, this->memory.ram.rdata[MEMResult]);
                 }
                 else if(MEMopCode == 50) {
-                    this->memory.ram.setMemory(MEMResult, this->registers[destinationRegisterMEM]);
+                    bool L1miss = false;
+                    bool L2miss = false;
+                    int totalMemLatency = this->memory.writeMemory(MEMResult, this->registers[destinationRegisterMEM], &L1miss, &L2miss);                    
+
+                    if(L1miss) {
+                        this->L1misses++;
+                    }
+                    if(L2miss) {
+                        this->L2misses++;
+                    }
+
+                    //  MEMORY STALLS REQUIRED
+                    for(int j = 1; j < totalMemLatency; j++) {
+                        this->my_clock++;
+                        this->totalStalls++;
+                    }
                 }
             }
 
