@@ -170,3 +170,7 @@ Whenever the WB stage is executed, the WB boolean is set to *false*.
 * Thus we simply added the total latency and made a for loop to increase 'my_clock'. This is done in order to simulate the whole latency problem.
 * This is same for both Load and Store operations.
 * Details of the cases are present in "./phase3/Testing/P3.xlsx".
+
+## PHASE 3 (EXTENDED: MEMORY IMPLEMENTING WRITE BACK)
+
+*30/4/2021: Note: Incomplete and throwing a lot of logical errors*
