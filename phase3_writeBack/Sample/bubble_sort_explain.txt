@@ -1,0 +1,66 @@
+A0 = 5              // Size of the array
+A1 = 30             // Following are the elements of the array
+A2 = 7
+A3 = 19
+A4 = 70
+A5 = 3
+//  //////////////////////////////////////////////////
+//  Use of registers:
+
+//  R1 = size of the array - 1
+//  R2 = i iterator
+//  R3 = j iterator
+//  R4 = temp to store max
+//  R5 = size - 1 - R2
+//  R6 = j + 1
+//  R7 = A[j]
+//  R8 = A[j + 1]
+//  R10 = storing 0
+//  //////////////////////////////////////////////////
+//  //////////////////////////////////////////////////
+Note:
+1) Since we only have BGT and BGE instructions, loop conditions like "(i < n)" are to be viewed as "(n > i)"
+//  //////////////////////////////////////////////////
+&$MAIN:
+LD R1, A0, R2                   // All registers are initialised to 0, thus we load 0(A0) into R1
+ADDI R1, R1, -1                 // R1 is set to n - 1
+    label1: 
+    BGE R2, R1, label4              // Jump out of the loop if (i >= n - 1)
+    SUB R5, R1, R2              // R5 = n - 1 - i
+        label2:
+        BGE R3, R5, label3      // Jump out of the loop if (j >= n - i - 1)
+        ADDI R6, R3, 1          // R6 = j + 1
+        LD R7, A1, R3           // R7 = A[j]
+        LD R8, A1, R6           // R8 = A[j + 1]
+        BGT R8, R7, label5      // Jump if A[j + 1] > A[j]
+        ST R8, A1, R3           // A[j] = R8
+        ST R7, A1, R6           // A[j + 1] = R
+        label5:
+        ADDI R3, R3, 1          // j++
+        JUMP label2
+    label3:
+    SUB R3, R3, R3              // j = 0
+    ADDI R2, R2, 1              // i++
+    JUMP label1
+label4:
+&$END:
+
+//  label1 = -13
+//  label2 = -8
+//  label3 = 9
+//  label4 = 14
+//  label5 = 3
+
+void bubbleSort(int *a, int n) {
+    int i = 0;
+    int j = 0;
+    while(n - 1 > i) {
+        while(n - i - 1 > j) {
+            if(a[j] > a[j + 1])
+                swap(&a[j], &a[j+1]);
+            j++;
+        }
+        j = 0;
+        i++;
+    }
+}

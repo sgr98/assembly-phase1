@@ -1,0 +1,459 @@
+void Processor::execute_noForwarding(vector<struct bitIns> encodedIns) {
+    int size = encodedIns.size();
+    struct bitIns currInstruction;
+
+    bool WBoper = false;
+    bool MEMoper = false;
+    bool EXoper = false;
+    bool IRoper = false;
+    bool IFoper = true;
+    
+    int opCode = initialValue;
+    int registerSource1 = initialValue;
+    int registerSource2 = initialValue;
+    int registerDestination = initialValue;
+    int immediate = -2;
+
+    int EXopCode = initialValue;
+    int destinationRegisterEX = initialValue;
+    int EXResult = initialValue;
+
+    int MEMopCode = initialValue;
+    int destinationRegisterMEM = initialValue;
+    int MEMResult = initialValue;
+
+    int destinationRegisterWB = initialValue;
+
+    int runOnlyUpp = 1;
+    int stallType = 0;
+    bool branchDec= false;
+
+    bool uniqueCase1 = false;
+
+    while(IFoper || IRoper || EXoper || MEMoper || WBoper) {
+        cout << "\n|||||||||||||||||||||||||||||||||||||||||||||||\n" << endl;
+        printStalledInstructions();
+        cout << "Current Instruction Index: " << this->registers[0] << endl;
+        cout << "StallType: " << stallType << endl;
+        cout << "CLK: " << my_clock << endl;
+
+
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // WB Stage
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        if(WBoper && !(runOnlyUpp > 5)) {
+            cout << "WB ";
+            WBoper = false;
+            destinationRegisterWB = destinationRegisterMEM;
+            if(MEMopCode >= 0 && MEMopCode <= 15) {
+                if(MEMopCode == 1) {
+                    this->registers[destinationRegisterWB] = MEMResult;
+                }
+                else if(MEMopCode == 2) {
+                    this->registers[destinationRegisterWB] = MEMResult;
+                }
+            }
+            else if(MEMopCode >= 16 && MEMopCode <= 31) {
+                if(MEMopCode == 17) {
+                    this->registers[destinationRegisterWB] = MEMResult;
+                }
+            }
+
+            if(stallType > 0 && !MEMoper) {
+                if(stallType == 1) {
+                    destinationRegisterMEM = -1;
+                    destinationRegisterWB = -1;
+                }
+                stallType--;
+                runOnlyUpp++;
+                my_clock++;
+                if(stallType == 0) {
+                    runOnlyUpp = 1;
+                }
+                continue;
+            }
+            cout << "WB ";
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // MEM Stage
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        if(MEMoper && !(runOnlyUpp > 4)) {
+            cout << "MEM ";
+            WBoper = true;
+            MEMoper = false;
+            MEMopCode = EXopCode;
+            destinationRegisterMEM = destinationRegisterEX;
+            MEMResult = EXResult;
+
+            if(MEMopCode >= 48 && MEMopCode <= 63) {
+                if(MEMopCode == 49) {
+                    this->registers[destinationRegisterMEM] = this->memory[MEMResult];
+                }
+                else if(MEMopCode == 50) {
+                    this->memory[MEMResult] = this->registers[destinationRegisterMEM];
+                }
+            }
+
+            if(stallType > 0) {
+                if(EXoper) {
+                    uniqueCase1 = true;
+                }
+                destinationRegisterEX = -1;
+                stallType--;
+                runOnlyUpp++;
+                my_clock++;
+                if(stallType == 0) {
+                    runOnlyUpp = 1;
+                }
+                continue;
+            }
+            cout << "MEM ";
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // EX Stage
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        if(EXoper && !(runOnlyUpp > 3)) {
+            cout << "EX ";
+            EXopCode = opCode;
+            destinationRegisterEX = registerDestination;
+            
+            if(EXopCode >= 0 && EXopCode <= 15) {
+                if(EXopCode == 1) {
+                    EXResult = add(registerSource1, registerSource2);
+                }
+                else if(EXopCode == 2) {
+                    EXResult = sub(registerSource1, registerSource2);
+                }
+            }
+            else if(EXopCode >= 16 && EXopCode <= 31) {
+                if(EXopCode == 17) {
+                    EXResult = add(registerSource1, immediate);
+                }
+                else if(EXopCode == 18) {
+                    if(bne(registerDestination, registerSource1))
+                        this->registers[0] += immediate;
+                    else
+                        this->registers[0]++;
+                }
+                else if(EXopCode == 19) {
+                    if(beq(registerDestination, registerSource1))
+                        this->registers[0] += immediate;
+                    else
+                        this->registers[0]++;
+                }
+                else if(EXopCode == 20) {
+                    if(bgt(registerDestination, registerSource1))
+                        this->registers[0] += immediate;
+                    else
+                        this->registers[0]++;
+                }
+                else if(EXopCode == 21) {
+                    if(bge(registerDestination, registerSource1))
+                        this->registers[0] += immediate;
+                    else
+                        this->registers[0]++;
+                }
+            }
+            else if(EXopCode >= 32 && EXopCode <= 47) {
+                if(EXopCode == 33) {
+                    this->registers[0] += immediate;
+                }
+            }
+            else if(EXopCode >= 48 && EXopCode <= 63) {
+                if(EXopCode == 49) {
+                    EXResult = add(registerSource1, this->registers[registerSource2]);
+                }
+                else if(EXopCode == 50) {
+                    EXResult = add(registerSource1, this->registers[registerSource2]);
+                }
+            }
+
+            MEMoper = true;
+            EXoper = false;
+            cout << "EX ";
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // ID/RF Stage
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        if(IRoper && !(runOnlyUpp > 2)) {
+            cout << "ID/RF ";
+            opCode = bitToInt(currInstruction, 26, 31);
+
+            if(opCode >= 0 && opCode <= 15) {
+                registerDestination = bitToInt(currInstruction, 21, 25);
+                registerSource1 = bitToInt(currInstruction, 16, 20);
+                registerSource2 = bitToInt(currInstruction, 11, 15);
+
+                cout << "\nregisterDestination ==> " << registerDestination << endl;
+                cout << "registerSource1 ==> " << registerSource1 << endl;
+                cout << "registerSource2 ==> " << registerSource2 << endl;
+                cout << "destinationRegisterEX ==> " << destinationRegisterEX << endl;
+                cout << "destinationRegisterMEM ==> " << destinationRegisterMEM << endl;
+                cout << "destinationRegisterWB ==> " << destinationRegisterWB << endl;
+
+                if(destinationRegisterEX == registerSource1 || destinationRegisterEX == registerSource2) {
+                    stallInstructionIndex.push_back(this->registers[0]);
+                    if(WBoper && !MEMoper) {
+                        runOnlyUpp = 3;
+                        totalStalls += 2;
+                        stallType = 1;
+                        destinationRegisterEX = -1;
+                    }
+                    else {
+                        runOnlyUpp = 3;
+                        totalStalls += 3;
+                        stallType = 2;
+                    }
+                    my_clock++;
+                    // destinationRegisterEX = -1;
+                    continue;
+                }
+                else if(destinationRegisterMEM == registerSource1 || destinationRegisterMEM == registerSource2) {
+                    stallInstructionIndex.push_back(this->registers[0]);
+                    runOnlyUpp = 3;
+                    totalStalls += 2;
+                    stallType = 1;
+                    my_clock++;
+                    destinationRegisterEX = -1; //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    continue;
+                }
+                else if(destinationRegisterWB == registerSource1 || destinationRegisterWB == registerSource2) {
+                    stallInstructionIndex.push_back(this->registers[0]);
+                    totalStalls += 1;
+                    my_clock++;
+                    continue;
+                }
+                this->registers[0]++;
+            }
+
+            else if(opCode >= 16 && opCode <= 31) {
+                registerDestination = bitToInt(currInstruction, 21, 25);
+                registerSource1 = bitToInt(currInstruction, 16, 20);
+                immediate = bitToInt(currInstruction, 0, 15);
+                
+                cout << "\nregisterDestination ==> " << registerDestination << endl;
+                cout << "registerSource1 ==> " << registerSource1 << endl;
+                cout << "immediate ==> " << immediate << endl;
+                cout << "destinationRegisterEX ==> " << destinationRegisterEX << endl;
+                cout << "destinationRegisterMEM ==> " << destinationRegisterMEM << endl;
+                cout << "destinationRegisterWB ==> " << destinationRegisterWB << endl;
+
+                if(opCode >= 17 && opCode <= 17) {
+                    if(destinationRegisterEX == registerSource1) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        if(WBoper && !MEMoper) {
+                            runOnlyUpp = 3;
+                            totalStalls += 2;
+                            stallType = 1;
+                            destinationRegisterEX = -1;
+                        }
+                        else {
+                            runOnlyUpp = 3;
+                            totalStalls += 3;
+                            stallType = 2;
+                        }
+                        my_clock++;
+                        // destinationRegisterEX = -1;
+                        continue;
+                    }
+                    else if(destinationRegisterMEM == registerSource1) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        runOnlyUpp = 3;
+                        totalStalls += 2;
+                        stallType = 1;
+                        my_clock++;
+                        destinationRegisterEX = -1;
+                        continue;
+                    }
+                    else if(destinationRegisterWB == registerSource1) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        totalStalls += 1;
+                        my_clock++;
+                        continue;
+                    }
+                    this->registers[0]++;
+                }
+                else {
+                    if(destinationRegisterEX == registerSource1 || destinationRegisterEX == registerDestination) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        if(WBoper && !MEMoper) {
+                            runOnlyUpp = 3;
+                            totalStalls += 2;
+                            stallType = 1;
+                            destinationRegisterEX = -1;
+                        }
+                        else {
+                            runOnlyUpp = 3;
+                            totalStalls += 3;
+                            stallType = 2;
+                        }
+                        my_clock++;
+                        continue;
+                    }
+                    else if(destinationRegisterMEM == registerSource1 || destinationRegisterMEM == registerDestination) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        runOnlyUpp = 3;
+                        totalStalls += 2;
+                        stallType = 1;
+                        my_clock++;
+                        continue;
+                    }
+                    else if(destinationRegisterWB == registerSource1 || destinationRegisterWB == registerDestination) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        totalStalls += 1;
+                        my_clock++;
+                        continue;
+                    }
+                    else {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        branchDec = true;
+                    }
+                }
+                
+            }
+
+            else if(opCode >= 32 && opCode <= 47) {
+                immediate = bitToInt(currInstruction, 0, 15);
+                
+                cout << "\nimmediate ==> " << immediate << endl;
+                cout << "destinationRegisterEX ==> " << destinationRegisterEX << endl;
+                cout << "destinationRegisterMEM ==> " << destinationRegisterMEM << endl;
+                cout << "destinationRegisterWB ==> " << destinationRegisterWB << endl;
+                
+                stallInstructionIndex.push_back(this->registers[0]);
+                branchDec = true;
+            }
+
+            else if(opCode >= 48 && opCode <= 63) {
+                registerDestination = bitToInt(currInstruction, 21, 25);
+                registerSource1 = bitToInt(currInstruction, 16, 20);
+                registerSource2 = bitToInt(currInstruction, 11, 15);
+
+                cout << "\nregisterDestination ==> " << registerDestination << endl;
+                cout << "registerSource1 ==> " << registerSource1 << endl;
+                cout << "registerSource2 ==> " << registerSource2 << endl;
+                cout << "destinationRegisterEX ==> " << destinationRegisterEX << endl;
+                cout << "destinationRegisterMEM ==> " << destinationRegisterMEM << endl;
+                cout << "destinationRegisterWB ==> " << destinationRegisterWB << endl;
+
+                if(opCode == 49) {
+                    if(destinationRegisterEX == registerSource2) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        if(WBoper && !MEMoper) {
+                            runOnlyUpp = 3;
+                            totalStalls += 2;
+                            stallType = 1;
+                            destinationRegisterEX = -1;
+                        }
+                        else {
+                            runOnlyUpp = 3;
+                            totalStalls += 3;
+                            stallType = 2;
+                        }
+                        my_clock++;
+                        continue;
+                    }
+                    else if(destinationRegisterMEM == registerSource2) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        runOnlyUpp = 3;
+                        totalStalls += 2;
+                        stallType = 1;
+                        my_clock++;                    
+                        continue;
+                    }
+                    else if(destinationRegisterWB == registerSource2) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        totalStalls += 1;
+                        my_clock++;
+                        continue;
+                    }
+                }
+                else if(opCode == 50) {
+                    if(destinationRegisterEX == registerDestination || destinationRegisterEX == registerSource2) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        if(WBoper && !MEMoper) {
+                            runOnlyUpp = 3;
+                            totalStalls += 2;
+                            stallType = 1;
+                            destinationRegisterEX = -1;
+                        }
+                        else {
+                            runOnlyUpp = 3;
+                            totalStalls += 3;
+                            stallType = 2;
+                        }
+                        my_clock++;
+                        continue;
+                    }
+                    else if(destinationRegisterEX == registerDestination || destinationRegisterMEM == registerSource2) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        runOnlyUpp = 3;
+                        totalStalls += 2;
+                        stallType = 1;
+                        my_clock++;
+                        continue;
+                    }
+                    else if(destinationRegisterEX == registerDestination || destinationRegisterWB == registerSource2) {
+                        stallInstructionIndex.push_back(this->registers[0]);
+                        totalStalls += 1;
+                        my_clock++;
+                        continue;
+                    }
+                }
+                this->registers[0]++;
+            }
+
+            EXoper = true;
+            IRoper = false;
+            cout << "ID/RF ";
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // IF Stage
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        if(IFoper && !(runOnlyUpp > 1)) {
+            cout << "IF ";
+            if(this->registers[0] < size) {
+                currInstruction = IF(encodedIns, this->registers[0]);
+                IRoper = true;
+                if(branchDec) {
+                    totalStalls++;
+                    IRoper = false;
+                    branchDec = false;
+                    my_clock++;
+                    continue;
+                }
+            }
+            else {
+                IFoper = false;
+            }
+            cout << "IF ";
+        }
+
+
+        my_clock++;
+    }
+}
