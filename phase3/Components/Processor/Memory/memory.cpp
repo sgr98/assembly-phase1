@@ -326,7 +326,6 @@ int Memory::writeMemory(int address, int value, bool *L1miss, bool *L2miss) {
     else {
         *L1miss = true;
     }
-    latency += this->L1.clatency;
 
     int L2find = this->L2.search(address, this->blockSize);
     if(L2find != -1) {  //  Write L2 cahce if present
@@ -337,7 +336,6 @@ int Memory::writeMemory(int address, int value, bool *L1miss, bool *L2miss) {
     else {
         *L2miss = true;
     }
-    latency += this->L2.clatency;
 
     latency += this->ram.rlatency;
     this->ram.setMemory(address, value);      //  Write Memory
